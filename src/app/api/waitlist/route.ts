@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
   try {
     const token = await signApprovalToken(normalizedEmail);
-    const approvalLinkBase = appUrl ?? "";
+    const approvalLinkBase = appUrl ?? "https://lumo-seven-eta.vercel.app";
     const approvalUrl = `${approvalLinkBase}/api/waitlist/approve?token=${encodeURIComponent(token)}`;
 
     await sgMail.send({

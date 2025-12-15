@@ -163,6 +163,17 @@ If you plan to test billing flows locally:
 
 ---
 
+## 9. Deployment pipeline.
+- Step 1: Push the project directory into GitHub.
+- Step 2: Open vercel. Create an account and a team. Link Github account with Vercel
+- Step 3: Copy and Paste all the .env.local variables into vercel's env.
+- Step 4: Go to convex, and create a production deployment key. Name it CONVEX_DEPLOY_KEY. Add it to env variables in Vercel.
+- Step 5: Deploy. and then Push to production.
+- Step 6: Copy the domain link, go to convex, replace SITE_URL with this link.
+- GOOD TO GO !
+
+---
+
 ## 9. Troubleshooting Tips
 
 - Missing Convex variables → rerun `npx convex dev` and copy values.
@@ -173,8 +184,3 @@ If you plan to test billing flows locally:
 ---
 
 With the `.env.local` configured and both servers running, you should be able to sign in with Google, access the dashboard, and exercise the full S2C experience locally. Reach out if you need extra configuration details. Happy building!
-
-
-
-
-

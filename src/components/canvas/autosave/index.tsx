@@ -15,6 +15,7 @@ export const Autosave = () => {
 
   const [autosaveProject, { isLoading: isSaving }] =
     useAutosaveProjectMutation();
+
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedRef = useRef<string>("");
@@ -27,11 +28,20 @@ export const Autosave = () => {
   useEffect(() => {
     if (!isReady) return;
 
+    // ✅ Trim what we send to Convex (no past/future history, no extra slice data)
+    const shapesData = {
+      shapes: shapesState.shapes,
+      tool: shapesState.tool,
+      selected: shapesState.selected,
+      frameCounter: shapesState.frameCounter,
+    };
+
     const stateString = JSON.stringify({
-      shapes: shapesState,
+      shapes: shapesData,
       viewport: viewportState,
     });
 
+    // Skip if nothing changed
     if (stateString === lastSavedRef.current) return;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -43,11 +53,13 @@ export const Autosave = () => {
       abortRef.current = new AbortController();
 
       setSaveStatus("saving");
+
       try {
         await autosaveProject({
           projectId: projectId as string,
           userId: user?.id as string,
-          shapesData: shapesState,
+          // ✅ send the trimmed payload, not the entire Redux slice
+          shapesData,
           viewportData: {
             scale: viewportState.scale,
             translate: viewportState.translate,
@@ -58,6 +70,7 @@ export const Autosave = () => {
         setTimeout(() => setSaveStatus("idle"), 2000);
       } catch (err: unknown) {
         if ((err as Error)?.name === "AbortError") return;
+        console.error("[Autosave] Failed to autosave project", err);
         setSaveStatus("error");
         setTimeout(() => setSaveStatus("idle"), 3000);
       }
@@ -68,7 +81,11 @@ export const Autosave = () => {
     };
   }, [
     isReady,
-    shapesState,
+    // Only re-run when these actually change
+    shapesState.shapes,
+    shapesState.tool,
+    shapesState.selected,
+    shapesState.frameCounter,
     viewportState,
     projectId,
     user?.id,

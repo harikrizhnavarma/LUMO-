@@ -1,0 +1,98 @@
+# Changelog - Development stage.
+
+## [1.2.0] - 2025-12-15
+
+### Added
+
+- Canvas image reference tool:
+    - New toolbar Image tool with upload/replace/clear UI and draggable boxes (max 5).
+    - Live preview outline while drawing image boxes.
+    - Image refs are included in frame snapshots and generation prompts so generated UIs place similar images in the same positions.
+- Code button surfaced in Generated UI card:
+    - Added visible Code action to copy/download TSX for generated designs.
+
+### Changed
+
+- Auth experience styling locked to dark hero imagery:
+    - Sign-in and sign-up pages use static dark hero photos with glassmorphic dark forms.
+    - Copy emphasizes welcoming new users to LUMO Studios.
+    - Google OAuth button restyled (white pill, dark label) for better contrast.
+
+## [1.1.1] - 2025-12-09
+
+### Added
+
+- Auto-save for project sketches and generated UIs:
+    - Implemented projects:updateProjectSketches Convex mutation to persist canvas state.
+    - Added logging to confirm saves.
+
+### Fixed
+
+Convex runtime issues:
+- Buffer is not defined in Convex functions:
+    - Removed Node-only Buffer usage or added an appropriate polyfill so Convex code runs in its expected environment.
+
+- Uncaught Error: Not authenticated in projects:getProject after sign-out:
+    - Gated project queries behind auth checks.
+    - Ensured the frontend does not call protected queries after auth:store reports type: signOut.
+
+### Changed
+
+- Adjusted workspace box styling on dashboard to align with the canvas toolbox aesthetic in light mode:
+    - Started from class="rounded-xl border bg-card p-6".
+    - Updated background, border, and text/shadow to match the toolbox card style (smoother border, subtle shadow, theme-aware colors).
+
+## [1.1.0] - 2025-12-08
+
+### Added
+
+- Global dark/light mode wiring for:
+    - Dashboard, canvas toolbox, and other windows.
+    - Ensured that the main sliding workspace/toolbox panel on the right respects both themes.
+
+- Added extra importance to include contextual image generation while generating UI from canvas.
+
+### Fixed
+
+- Theme-specific styling issues:
+    - Label text which was always white even in light mode now uses neutral text classes that adapt to theme.
+    - Adjusted bottom canvas toolbar classes:
+        - fixed the relevant div classes.
+        - Ensured it overlays correctly and looks consistent in both themes.
+
+    - Fixed z-index issues where expanded menus fell behind the canvas toolbox bar by increasing their z- class or reordering stacking context.
+
+- Cleared the ƒ?oMissing <html> and <body> tags in the root layoutƒ?? runtime error.
+- Rectified rogue script tags which were causing rendering problems.
+- Fixed User profile picture not loaded properly.
+
+## [1.0.0] - 2025-12-07
+
+### Added
+
+- Initial production release.
+- Core app shell and routing.
+- Project scaffolding (Next.js, Convex, Tailwind, etc.).
+- Basic layout and theme setup.
+- Initial API endpoints for testing.
+- Authentication & user sessions.
+- Dashboard UI and base components.
+
+## [1.0.0] - 2025-12-06
+
+### Added
+
+- Subscription tiers UI:
+    - STARTER / PRO / ENTERPRISE (or equivalent) with:
+        - Monthly price.
+        - Generation limits and feature bullets.
+
+- ƒ?oChoose planƒ?? buttons wired to a checkout handler (stub integration with billing).
+
+### Fixed
+
+- 400 Bad Request issues in the checkout flow by:
+    - Ensuring the correct plan/price identifiers are passed to the backend / billing SDK.
+    - Adjusting props and handler signatures in src/components/buttons/checkout/index.tsx so TypeScript types match real usage.
+
+- Type errors in checkout/index.tsx (prop types, async handlers, etc.) flagged by the IDE after refactor.

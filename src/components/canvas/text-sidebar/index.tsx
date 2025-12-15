@@ -73,165 +73,249 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
   };
 
   return (
-    <div
-      className={cn(
-        "fixed right-5 top-1/2 transform -translate-y-1/2  w-80 backdrop-blur-xl bg-white/[0.08] border-white/[0.12] gap-2 p-3 saturate-150  border rounded-lg z-50 transition-transform duration-300",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}>
-      <div className="p-4 flex flex-col gap-10 overflow-y-auto max-h-[calc(100vh-8rem)]">
-        <div className="space-y-2">
-          <Label className="text-white/80">Font Family</Label>
-          <Select
-            value={selectedTextShape.fontFamily}
-            onValueChange={(value) => updateTextProperty("fontFamily", value)}>
-            <SelectTrigger className="bg-white/5 border-white/10 w-full text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-black/90 border-white/10">
-              {fontFamilies.map((font) => (
-                <SelectItem
-                  key={font}
-                  value={font}
-                  className="text-white hover:bg-white/10">
-                  <span style={{ fontFamily: font }}>{font.split(",")[0]}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="text-white/80">
-            Font Size: {selectedTextShape.fontSize}px
-          </Label>
-          <Slider
-            value={[selectedTextShape.fontSize]}
-            onValueChange={([value]) => updateTextProperty("fontSize", value)}
-            min={8}
-            max={128}
-            step={1}
-            className="w-full"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-white/80">
-            Font Weight: {selectedTextShape.fontWeight}
-          </Label>
-          <Slider
-            value={[selectedTextShape.fontWeight]}
-            onValueChange={([value]) => updateTextProperty("fontWeight", value)}
-            min={100}
-            max={900}
-            step={100}
-            className="w-full"
-          />
-        </div>
+  <div
+    className={cn(
+      "fixed right-5 top-1/2 -translate-y-1/2 w-80 " +
+      "backdrop-blur-xl " +
+      "bg-white/80 dark:bg-white/[0.06] " +
+      "border border-neutral-200 dark:border-white/15 " +
+      "shadow-md dark:shadow-none " +
+      "rounded-xl p-3 gap-2 " +
+      "text-neutral-900 dark:text-white " +
+      "saturate-150 " +
+      "z-[70] " + // ⬅️ higher than bottom bar z-50
+      "transition-transform duration-300",
+      isOpen ? "translate-x-0" : "translate-x-full"
+    )}
+  >
+    <div className="p-4 flex flex-col gap-10 overflow-y-auto max-h-[calc(100vh-8rem)]">
+      {/* Font family */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Font Family
+        </Label>
+        <Select
+          value={selectedTextShape.fontFamily}
+          onValueChange={(value) => updateTextProperty("fontFamily", value)}
+        >
+          <SelectTrigger
+            className="
+              z-[80]
+              w-full
+              bg-white dark:bg-white/5
+              border border-neutral-300 dark:border-white/15
+              text-neutral-900 dark:text-white
+              rounded-lg
+            "
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent
+            className="
+              z-[80]
+              bg-white dark:bg-neutral-950
+              border border-neutral-200 dark:border-white/15
+              text-neutral-900 dark:text-white
+            "
+          >
+            {fontFamilies.map((font) => (
+              <SelectItem
+                key={font}
+                value={font}
+                className="
+                  text-neutral-900 dark:text-white
+                  hover:bg-neutral-100 dark:hover:bg-white/10
+                "
+              >
+                <span style={{ fontFamily: font }}>{font.split(',')[0]}</span>
+              </SelectItem>
+            ))}
+</SelectContent>
 
-        <div className="space-y-3">
-          <Label className="text-white/80">Style</Label>
-          <div className="flex gap-2">
-            <Toggle
-              pressed={selectedTextShape.fontWeight >= 600}
-              onPressedChange={(pressed) =>
-                updateTextProperty("fontWeight", pressed ? 700 : 400)
-              }
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">
-              <Bold className="w-4 h-4" />
-            </Toggle>
-            <Toggle
-              pressed={selectedTextShape.fontStyle === "italic"}
-              onPressedChange={(pressed) =>
-                updateTextProperty("fontStyle", pressed ? "italic" : "normal")
-              }
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">
-              <Italic className="w-4 h-4" />
-            </Toggle>
-            <Toggle
-              pressed={selectedTextShape.textDecoration === "underline"}
-              onPressedChange={(pressed) =>
-                updateTextProperty(
-                  "textDecoration",
-                  pressed ? "underline" : "none"
-                )
-              }
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">
-              <Underline className="w-4 h-4" />
-            </Toggle>
-            <Toggle
-              pressed={selectedTextShape.textDecoration === "line-through"}
-              onPressedChange={(pressed) =>
-                updateTextProperty(
-                  "textDecoration",
-                  pressed ? "line-through" : "none"
-                )
-              }
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">
-              <Strikethrough className="w-4 h-4" />
-            </Toggle>
-          </div>
-        </div>
+        </Select>
+      </div>
 
-        <div className="space-y-2">
-          <Label className="text-white/80">
-            Line Height: {selectedTextShape.lineHeight}
-          </Label>
-          <Slider
-            value={[selectedTextShape.lineHeight]}
-            onValueChange={([value]) => updateTextProperty("lineHeight", value)}
-            min={0.8}
-            max={3}
-            step={0.1}
-            className="w-full"
-          />
-        </div>
+      {/* Font size */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Font Size: {selectedTextShape.fontSize}px
+        </Label>
+        <Slider
+          value={[selectedTextShape.fontSize]}
+          onValueChange={([value]) => updateTextProperty("fontSize", value)}
+          min={8}
+          max={128}
+          step={1}
+          className="w-full"
+        />
+      </div>
 
-        {/* Letter Spacing */}
-        <div className="space-y-2">
-          <Label className="text-white/80">
-            Letter Spacing: {selectedTextShape.letterSpacing}px
-          </Label>
-          <Slider
-            value={[selectedTextShape.letterSpacing]}
-            onValueChange={([value]) =>
-              updateTextProperty("letterSpacing", value)
+      {/* Font weight */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Font Weight: {selectedTextShape.fontWeight}
+        </Label>
+        <Slider
+          value={[selectedTextShape.fontWeight]}
+          onValueChange={([value]) => updateTextProperty("fontWeight", value)}
+          min={100}
+          max={900}
+          step={100}
+          className="w-full"
+        />
+      </div>
+
+      {/* Style toggles */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Style
+        </Label>
+        <div className="flex gap-2">
+          <Toggle
+            pressed={selectedTextShape.fontWeight >= 600}
+            onPressedChange={(pressed) =>
+              updateTextProperty("fontWeight", pressed ? 700 : 400)
             }
-            min={-2}
-            max={10}
-            step={0.1}
-            className="w-full"
-          />
-        </div>
+            className="
+              border border-neutral-300 dark:border-white/20
+              bg-white dark:bg-white/5
+              text-neutral-700 dark:text-white
+              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
+              data-[state=on]:text-white dark:data-[state=on]:text-black
+            "
+          >
+            <Bold className="w-4 h-4" />
+          </Toggle>
 
-        {/* Text Color */}
-        <div className="space-y-2">
-          <Label className="text-white/80 flex items-center gap-2">
-            <Palette className="w-4 h-4" />
-            Text Color
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              value={colorInput}
-              onChange={(e) => handleColorChange(e.target.value)}
-              placeholder="#ffffff"
-              className="bg-white/5 border-white/10 text-white flex-1"
-            />
-            <div
-              className="w-10 h-10 rounded border border-white/20 cursor-pointer"
-              style={{ backgroundColor: selectedTextShape.fill || "#ffffff" }}
-              onClick={() => {
-                const input = document.createElement("input");
-                input.type = "color";
-                input.value = selectedTextShape.fill || "#ffffff";
-                input.onchange = (e) => {
-                  const color = (e.target as HTMLInputElement).value;
-                  setColorInput(color);
-                  updateTextProperty("fill", color);
-                };
-                input.click();
-              }}
-            />
-          </div>
+          <Toggle
+            pressed={selectedTextShape.fontStyle === "italic"}
+            onPressedChange={(pressed) =>
+              updateTextProperty("fontStyle", pressed ? "italic" : "normal")
+            }
+            className="
+              border border-neutral-300 dark:border-white/20
+              bg-white dark:bg-white/5
+              text-neutral-700 dark:text-white
+              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
+              data-[state=on]:text-white dark:data-[state=on]:text-black
+            "
+          >
+            <Italic className="w-4 h-4" />
+          </Toggle>
+
+          <Toggle
+            pressed={selectedTextShape.textDecoration === "underline"}
+            onPressedChange={(pressed) =>
+              updateTextProperty(
+                "textDecoration",
+                pressed ? "underline" : "none"
+              )
+            }
+            className="
+              border border-neutral-300 dark:border-white/20
+              bg-white dark:bg-white/5
+              text-neutral-700 dark:text-white
+              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
+              data-[state=on]:text-white dark:data-[state=on]:text-black
+            "
+          >
+            <Underline className="w-4 h-4" />
+          </Toggle>
+
+          <Toggle
+            pressed={selectedTextShape.textDecoration === "line-through"}
+            onPressedChange={(pressed) =>
+              updateTextProperty(
+                "textDecoration",
+                pressed ? "line-through" : "none"
+              )
+            }
+            className="
+              border border-neutral-300 dark:border-white/20
+              bg-white dark:bg-white/5
+              text-neutral-700 dark:text-white
+              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
+              data-[state=on]:text-white dark:data-[state=on]:text-black
+            "
+          >
+            <Strikethrough className="w-4 h-4" />
+          </Toggle>
+        </div>
+      </div>
+
+      {/* Line height */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Line Height: {selectedTextShape.lineHeight}
+        </Label>
+        <Slider
+          value={[selectedTextShape.lineHeight]}
+          onValueChange={([value]) => updateTextProperty("lineHeight", value)}
+          min={0.8}
+          max={3}
+          step={0.1}
+          className="w-full"
+        />
+      </div>
+
+      {/* Letter spacing */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+          Letter Spacing: {selectedTextShape.letterSpacing}px
+        </Label>
+        <Slider
+          value={[selectedTextShape.letterSpacing]}
+          onValueChange={([value]) =>
+            updateTextProperty("letterSpacing", value)
+          }
+          min={-2}
+          max={10}
+          step={0.1}
+          className="w-full"
+        />
+      </div>
+
+      {/* Text color */}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80 flex items-center gap-2">
+          <Palette className="w-4 h-4" />
+          Text Color
+        </Label>
+        <div className="flex gap-2">
+          <Input
+            value={colorInput}
+            onChange={(e) => handleColorChange(e.target.value)}
+            placeholder="#111111"
+            className="
+              flex-1
+              bg-white dark:bg-white/5
+              border border-neutral-300 dark:border-white/15
+              text-neutral-900 dark:text-white
+              placeholder:text-neutral-400 dark:placeholder:text-white/50
+            "
+          />
+          <div
+            className="
+              w-10 h-10 rounded
+              border border-neutral-300 dark:border-white/30
+              cursor-pointer
+            "
+            style={{ backgroundColor: selectedTextShape.fill || "#111111" }}
+            onClick={() => {
+              const input = document.createElement("input");
+              input.type = "color";
+              input.value = selectedTextShape.fill || "#111111";
+              input.onchange = (e) => {
+                const color = (e.target as HTMLInputElement).value;
+                setColorInput(color);
+                updateTextProperty("fill", color);
+              };
+              input.click();
+            }}
+          />
         </div>
       </div>
     </div>
-  );
+  </div>
+)
 };

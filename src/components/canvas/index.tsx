@@ -1,23 +1,24 @@
-'use client'
+"use client";
 
 import {
   useInfiniteCanvas,
   useInspiration,
   useGlobalChat,
-} from '@/hooks/use-canvas'
-import { cn } from '@/lib/utils'
-import { ShapeRenderer } from './shapes'
-import { FramePreview } from './shapes/frame/preview'
-import { RectanglePreview } from './shapes/rectangle/preview'
-import { ElipsePreview } from './shapes/elipse/preview'
-import { FreeDrawStrokePreview } from './shapes/stroke/preview'
-import { ArrowPreview } from './shapes/arrow/preview'
-import { LinePreview } from './shapes/line/preview'
+} from "@/hooks/use-canvas";
+import { cn } from "@/lib/utils";
+import { ShapeRenderer } from "./shapes";
+import { FramePreview } from "./shapes/frame/preview";
+import { RectanglePreview } from "./shapes/rectangle/preview";
+import { ImageRefPreview } from "./shapes/imageref/preview";
+import { ElipsePreview } from "./shapes/elipse/preview";
+import { FreeDrawStrokePreview } from "./shapes/stroke/preview";
+import { ArrowPreview } from "./shapes/arrow/preview";
+import { LinePreview } from "./shapes/line/preview";
 
-import { SelectionOverlay } from './shapes/selection'
-import { TextSidebar } from './text-sidebar'
-import { InspirationSidebar } from './shapes/inspiration-sidebar'
-import { ChatWindow } from './shapes/generatedui/chat'
+import { SelectionOverlay } from "./shapes/selection";
+import { TextSidebar } from "./text-sidebar";
+import { InspirationSidebar } from "./shapes/inspiration-sidebar";
+import { ChatWindow } from "./shapes/generatedui/chat";
 
 export const InfiniteCanvas = () => {
   const {
@@ -34,10 +35,10 @@ export const InfiniteCanvas = () => {
     getFreeDrawPoints,
     isSidebarOpen,
     hasSelectedText,
-  } = useInfiniteCanvas()
+  } = useInfiniteCanvas();
 
   const { isInspirationOpen, closeInspiration, toggleInspiration } =
-    useInspiration()
+    useInspiration();
 
   const {
     isChatOpen,
@@ -46,18 +47,20 @@ export const InfiniteCanvas = () => {
     toggleChat,
     generateWorkflow,
     exportDesign,
-  } = useGlobalChat()
+  } = useGlobalChat();
 
-  const draftShape = getDraftShape()
-  const freeDrawPoints = getFreeDrawPoints()
+  const draftShape = getDraftShape();
+  const freeDrawPoints = getFreeDrawPoints();
 
   return (
     <>
       <TextSidebar isOpen={isSidebarOpen && hasSelectedText} />
+
       <InspirationSidebar
         isOpen={isInspirationOpen}
         onClose={closeInspiration}
       />
+
       {activeGeneratedUIId && (
         <ChatWindow
           generatedUIId={activeGeneratedUIId}
@@ -65,22 +68,35 @@ export const InfiniteCanvas = () => {
           onClose={closeChat}
         />
       )}
+
       <div
         ref={attachCanvasRef}
         role="application"
         aria-label="Infinite drawing canvas"
         className={cn(
-          'relative w-full h-full overflow-hidden select-none z-0',
+          `
+          relative w-full h-full overflow-hidden select-none z-0
+
+          /* ⭐ THEME-AWARE CANVAS BACKGROUND */
+          bg-[radial-gradient(circle,_rgba(0,0,0,0.08)_1px,_transparent_1px)]
+          dark:bg-[radial-gradient(circle,_rgba(255,255,255,0.15)_1px,_transparent_1px)]
+
+          /* background color underneath dots */
+          bg-neutral-50 dark:bg-neutral-900
+          `,
           {
-            'cursor-grabbing': viewport.mode === 'panning',
-            'cursor-grab': viewport.mode === 'shiftPanning',
-            'cursor-crosshair':
-              currentTool !== 'select' && viewport.mode === 'idle',
-            'cursor-default':
-              currentTool === 'select' && viewport.mode === 'idle',
+            "cursor-grabbing": viewport.mode === "panning",
+            "cursor-grab": viewport.mode === "shiftPanning",
+            "cursor-crosshair":
+              currentTool !== "select" && viewport.mode === "idle",
+            "cursor-default":
+              currentTool === "select" && viewport.mode === "idle",
           }
         )}
-        style={{ touchAction: 'none' }}
+        style={{
+          touchAction: "none",
+          backgroundSize: `${28 * viewport.scale}px ${28 * viewport.scale}px`,
+        }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -92,8 +108,8 @@ export const InfiniteCanvas = () => {
           className="absolute origin-top-left pointer-events-none z-10"
           style={{
             transform: `translate3d(${viewport.translate.x}px, ${viewport.translate.y}px, 0) scale(${viewport.scale})`,
-            transformOrigin: '0 0',
-            willChange: 'transform',
+            transformOrigin: "0 0",
+            willChange: "transform",
           }}
         >
           {shapes.map((shape) => (
@@ -117,42 +133,53 @@ export const InfiniteCanvas = () => {
           ))}
 
           {/* Draft previews */}
-          {draftShape && draftShape.type === 'frame' && (
+          {draftShape && draftShape.type === "frame" && (
             <FramePreview
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
 
-          {draftShape && draftShape.type === 'rect' && (
+          {draftShape && draftShape.type === "rect" && (
             <RectanglePreview
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
-          {draftShape && draftShape.type === 'ellipse' && (
+
+          {draftShape && draftShape.type === "imageref" && (
+            <ImageRefPreview
+              startWorld={draftShape.startWorld}
+              currentWorld={draftShape.currentWorld}
+            />
+          )}
+
+          {draftShape && draftShape.type === "ellipse" && (
             <ElipsePreview
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
-          {draftShape && draftShape.type === 'arrow' && (
+
+          {draftShape && draftShape.type === "arrow" && (
             <ArrowPreview
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
-          {draftShape && draftShape.type === 'line' && (
+
+          {draftShape && draftShape.type === "line" && (
             <LinePreview
               startWorld={draftShape.startWorld}
               currentWorld={draftShape.currentWorld}
             />
           )}
-          {currentTool === 'freedraw' && freeDrawPoints.length > 1 && (
+
+          {currentTool === "freedraw" && freeDrawPoints.length > 1 && (
             <FreeDrawStrokePreview points={freeDrawPoints} />
           )}
         </div>
       </div>
     </>
-  )
-}
+  );
+};

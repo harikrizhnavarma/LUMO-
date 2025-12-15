@@ -3,6 +3,19 @@ import type { EntityState } from "@reduxjs/toolkit";
 import type { Shape } from "@/redux/slice/shapes";
 import type { Id } from "../../convex/_generated/dataModel";
 
+// Brand entity (BrandKit V2)
+export interface Brand {
+  _id: Id<"brands">;
+  userId: Id<"users">;
+  name: string;
+  description?: string;
+  styleGuide?: string; // JSON string stored in Convex
+  moodBoardImages?: string[];
+  inspirationImages?: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
 // Redux shapes slice state structure that gets stored as sketchesData
 export interface ProjectSketchesData {
   shapes: EntityState<Shape, string>; // Entity adapter state from Redux
@@ -35,6 +48,7 @@ export interface ProjectGeneratedDesignData {
 export interface Project {
   _id: Id<"projects">;
   userId: Id<"users">;
+  brandId?: Id<"brands">; // Optional brand association
   name: string;
   description?: string;
   sketchesData: ProjectSketchesData; // Complete Redux shapes state
@@ -57,4 +71,5 @@ export interface ProjectSummary {
   isPublic?: boolean;
   tags?: string[];
   userId?: Id<"users">; // Included for public projects
+  brandId?: Id<"brands">; // Optional brand association
 }

@@ -8,7 +8,8 @@ export const GoogleOAuthButton = () => {
     <Button
       onClick={() => void signIn("google")}
       type="button"
-      variant="outline">
+      variant="outline"
+      className="h-10 w-full justify-center gap-2 rounded-full border border-white/40 bg-white text-neutral-800 hover:bg-white/90 hover:text-neutral-900">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="0.98em"
@@ -27,7 +28,7 @@ export const GoogleOAuthButton = () => {
           fill="#eb4335"
           d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
       </svg>
-      <span>Google</span>
+      <span className="text-sm font-semibold">Google</span>
     </Button>
   );
 };

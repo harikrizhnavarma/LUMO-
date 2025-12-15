@@ -8,6 +8,7 @@ import {
   Square,
   Circle,
   Pencil,
+  Image as ImageIcon,
   ArrowRight,
   Minus,
   Type,
@@ -46,6 +47,12 @@ const tools: Array<{
     description: "Draw ellipses and circles",
   },
   {
+    id: "imageref",
+    icon: <ImageIcon className="w-4 h-4" />,
+    label: "Image",
+    description: "Place an image reference box",
+  },
+  {
     id: "freedraw",
     icon: <Pencil className="w-4 h-4" />,
     label: "Free Draw",
@@ -82,20 +89,30 @@ export const ToolBarShapes = () => {
 
   return (
     <div className="col-span-1 flex justify-center items-center">
-      <div className="flex items-center backdrop-blur-xl backdrop-[url('#displacementFilter')] bg-white/[0.08] border border-white/[0.12] gap-2 rounded-full p-3 saturate-150">
+      <div
+        className="
+        flex items-center gap-2
+        backdrop-blur-xl 
+        bg-neutral-200/70 dark:bg-white/10
+        border border-neutral-300 dark:border-white/20
+        rounded-full p-3
+        transition
+      "
+      >
         {tools.map((tool) => (
           <Button
             key={tool.id}
-            variant={"ghost"}
+            variant="ghost"
             size="lg"
             onClick={() => selectTool(tool.id)}
             className={cn(
-              "cursor-pointer rounded-full p-3",
+              "cursor-pointer rounded-full p-3 transition border",
               currentTool === tool.id
-                ? "text-primary/100 bg-white/[0.12] border border-white/[0.16]"
-                : "text-primary/50 hover:bg-white/[0.06] border border-transparent"
+                ? "text-neutral-900 dark:text-white bg-neutral-300 dark:bg-white/20 border-neutral-400 dark:border-white/30"
+                : "text-neutral-700 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-300/50 dark:hover:bg-white/10 border-transparent"
             )}
-            title={`${tool.label} - ${tool.description}`}>
+            title={`${tool.label} - ${tool.description}`}
+          >
             {tool.icon}
           </Button>
         ))}

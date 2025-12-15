@@ -1,6 +1,17 @@
 import { Type, Hash, LayoutIcon } from "lucide-react";
 import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
 
 type Props = {
   children: React.ReactNode;
@@ -35,7 +46,7 @@ const Layout = async ({ children }: Props) => {
                 Style Guide
               </h1>
               <p className="text-muted-foreground mt-2 text-center lg:text-left">
-                Lorem ipsum dolor sit amet consectetur.
+                Straight in from your moodboard
               </p>
             </div>
 

@@ -12,20 +12,27 @@ export const Stroke = ({ shape }: { shape: FreeDrawShape }) => {
     .map((p) => `${p.x - minX + pad},${p.y - minY + pad}`)
     .join(" ");
 
+  const strokeColor =
+      !shape.stroke || shape.stroke === "#ffffff" || shape.stroke === "#fff"
+        ? "var(--canvas-stroke)"
+        : shape.stroke;
+  const fillColor = fill ?? "none";
+
   return (
     <svg
-      className="absolute pointer-events-none"
+      className="absolute pointer-events-none z-10"
       style={{
         left: minX - pad,
         top: minY - pad,
         width: width + pad * 2,
         height: height + pad * 2,
       }}
-      aria-hidden>
+      aria-hidden
+    >
       <polyline
         points={dPts}
-        fill={fill ?? "none"}
-        stroke={stroke}
+        fill={fillColor}
+        stroke={strokeColor}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"

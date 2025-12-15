@@ -401,16 +401,58 @@ export const useUpdateContainer = (shape: GeneratedUIShape) => {
   }, [shape.uiSpecData, shape.id, shape.h, dispatch])
 
   // Enhanced HTML sanitization function for basic safety
+    // Strong HTML sanitization for generated UI content
   const sanitizeHtml = (html: string) => {
-    const sanitized = html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      .replace(/on\w+="[^"]*"/gi, '') // Remove event handlers
-      .replace(/javascript:/gi, '') // Remove javascript: protocols
-      .replace(/data:/gi, '') // Remove data: protocols for safety
+    // 1) Remove ALL <script> tags (normal + self-closing)
+    let sanitized = html
+      // <script> ... </script>
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      // self-closing <script ... />
+      .replace(/<script[\s\S]*?\/>/gi, "");
 
-    return sanitized
-  }
+    // 2) Remove iframes completely
+    sanitized = sanitized
+      .replace(/<iframe[\s\S]*?<\/iframe>/gi, "");
+
+    // 3) Strip inline event handlers: onClick="...", onload='...', etc.
+    sanitized = sanitized
+      .replace(/\son\w+="[^"]*"/gi, "")
+      .replace(/\son\w+='[^']*'/gi, "");
+
+    // 4) Kill javascript: and data: URLs (basic safety; you can tighten further)
+    sanitized = sanitized
+      .replace(/javascript:/gi, "")
+      .replace(/data:/gi, "");
+
+    return sanitized;
+  };
+
+    const lastHeightRef = useRef<number>(shape.h);
+
+  // Ensure the shape height updates when content changes, without causing loops
+  useEffect(() => {
+    if (!containerRef.current || !shape.uiSpecData) return;
+
+    const frame = requestAnimationFrame(() => {
+      const actualHeight = containerRef.current?.offsetHeight ?? 0;
+      const prev = lastHeightRef.current;
+
+      // Only dispatch if height changed meaningfully
+      if (actualHeight > 0 && Math.abs(actualHeight - prev) > 10) {
+        lastHeightRef.current = actualHeight;
+        dispatch(
+          updateShape({
+            id: shape.id,
+            patch: { h: actualHeight },
+          })
+        );
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [shape.uiSpecData, shape.id, dispatch]);
+
+
 
   /**
    * CodeRabbit

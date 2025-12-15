@@ -1,4 +1,4 @@
-import { useLazyGetCheckoutQuery } from "@/redux/api/billing";
+import { useLazyGetCheckoutQuery, BillingPlan } from "@/redux/api/billing";
 import { useAppSelector } from "@/redux/store";
 import { toast } from "sonner";
 
@@ -6,10 +6,14 @@ export const useSubscriptionPlan = () => {
   const [trigger, { isFetching }] = useLazyGetCheckoutQuery();
   const { id } = useAppSelector((state) => state.profile);
 
-  console.log(id);
-  const onSubscribe = async () => {
+  const subscribeToPlan = async (plan: BillingPlan) => {
+    if (!id) {
+      toast.error("You need to be logged in to subscribe.");
+      return;
+    }
+
     try {
-      const res = await trigger(id).unwrap();
+      const res = await trigger({ userId: id, plan }).unwrap();
       // hosted checkout
       window.location.href = res.url;
     } catch (err) {
@@ -18,5 +22,5 @@ export const useSubscriptionPlan = () => {
     }
   };
 
-  return { onSubscribe, isFetching };
+  return { subscribeToPlan, isFetching };
 };

@@ -3,32 +3,48 @@
 import * as React from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSubscriptionPlan } from "@/hooks/use-billings";
 import { cn } from "@/lib/utils";
+import { useSubscriptionPlan } from "@/hooks/use-billings";
+import type { BillingPlan } from "@/redux/api/billing";
 
-export const SubscribeButton = () => {
-  const { onSubscribe, isFetching } = useSubscriptionPlan();
+type SubscribeButtonProps = {
+  plan: BillingPlan;        // "starter" | "professional" | "business"
+  label?: string;
+  className?: string;
+};
+
+export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
+  plan,
+  label,
+  className,
+}) => {
+  const { subscribeToPlan, isFetching } = useSubscriptionPlan();
+
+  const handleClick = React.useCallback(() => {
+    void subscribeToPlan(plan);
+  }, [plan, subscribeToPlan]);
+
   return (
     <Button
       type="button"
-      onClick={onSubscribe}
+      onClick={handleClick}
       disabled={isFetching}
       className={cn(
-        "backdrop-blur-xl bg-white/[0.08] border border-white/[0.12]",
-        "saturate-150 rounded-full shadow-xl",
-        "hover:bg-white/[0.12] hover:border-white/[0.16] transition-all duration-200",
-        "active:bg-white/[0.06] active:scale-[0.98]",
-        "focus:outline-none focus:ring-2 focus:ring-white/20",
+        "inline-flex items-center justify-center rounded-full",
+        "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary",
+        "shadow-lg shadow-primary/30",
         "disabled:opacity-50 disabled:cursor-not-allowed",
-        "text-white font-medium text-sm px-6 py-3"
-      )}>
+        "text-white font-medium text-sm px-6 py-3",
+        className,
+      )}
+    >
       {isFetching ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Redirecting…
         </>
       ) : (
-        "Subscribe"
+        label ?? "Subscribe"
       )}
     </Button>
   );

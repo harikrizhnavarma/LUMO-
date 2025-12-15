@@ -21,7 +21,6 @@ import {
 } from '@/redux/slice/viewport'
 import { toast } from 'sonner'
 import { useGenerateWorkflowMutation } from '@/redux/api/generation'
-import { exportGeneratedUIAsPNG } from '@/lib/frame-snapshot'
 import {
   setTool,
   addFrame,
@@ -31,6 +30,7 @@ import {
   addArrow,
   addLine,
   addText,
+  addImageRef,
   selectShape,
   clearSelection,
   updateShape,
@@ -38,9 +38,15 @@ import {
   type Tool,
   type Shape,
   FrameShape,
+  ImageRefShape,
   addGeneratedUI,
 } from '@/redux/slice/shapes'
-import { downloadBlob, generateFrameSnapshot } from '@/lib/frame-snapshot'
+import {
+  downloadBlob,
+  exportGeneratedUIAsPNG,
+  generateFrameSnapshot,
+  getShapesInsideFrame,
+} from '@/lib/frame-snapshot'
 import { nanoid } from '@reduxjs/toolkit'
 import {
   addErrorMessage,
@@ -54,7 +60,13 @@ import {
 
 // 📝 INTERFACES - Type definitions for our data structures
 interface DraftShape {
-  type: 'frame' | 'rect' | 'ellipse' | 'arrow' | 'line'
+  type:
+    | 'frame'
+    | 'rect'
+    | 'ellipse'
+    | 'imageref'
+    | 'arrow'
+    | 'line'
   startWorld: Point
   currentWorld: Point
 }
@@ -260,6 +272,7 @@ export const useInfiniteCanvas = () => {
       case 'frame':
       case 'rect':
       case 'ellipse':
+      case 'imageref':
       case 'generatedui':
         // For rectangular shapes, check if point is within bounds
         return (
@@ -460,6 +473,7 @@ export const useInfiniteCanvas = () => {
                   shape.type === 'frame' ||
                   shape.type === 'rect' ||
                   shape.type === 'ellipse' ||
+                  shape.type === 'imageref' ||
                   shape.type === 'generatedui'
                 ) {
                   initialShapePositionsRef.current[id] = {
@@ -490,6 +504,7 @@ export const useInfiniteCanvas = () => {
               hitShape.type === 'frame' ||
               hitShape.type === 'rect' ||
               hitShape.type === 'ellipse' ||
+              hitShape.type === 'imageref' ||
               hitShape.type === 'generatedui'
             ) {
               initialShapePositionsRef.current[hitShape.id] = {
@@ -540,11 +555,22 @@ export const useInfiniteCanvas = () => {
           dispatch(setTool('select'))
         } else {
           // DRAWING TOOLS - Start drawing a new shape
+          if (currentTool === 'imageref') {
+            const currentImageRefs = shapeList.filter(
+              (shape) => shape.type === 'imageref'
+            ).length
+            if (currentImageRefs >= 5) {
+              toast.error('You can add up to 5 image reference boxes')
+              return
+            }
+          }
+
           isDrawingRef.current = true
           if (
             currentTool === 'frame' ||
             currentTool === 'rect' ||
             currentTool === 'ellipse' ||
+            currentTool === 'imageref' ||
             currentTool === 'arrow' ||
             currentTool === 'line'
           ) {
@@ -610,6 +636,7 @@ export const useInfiniteCanvas = () => {
             shape.type === 'frame' ||
             shape.type === 'rect' ||
             shape.type === 'ellipse' ||
+            shape.type === 'imageref' ||
             shape.type === 'text' ||
             shape.type === 'generatedui'
           ) {
@@ -727,6 +754,15 @@ export const useInfiniteCanvas = () => {
               endY: draft.currentWorld.y,
             })
           )
+        } else if (draft.type === 'imageref') {
+          const currentImageRefs = shapeList.filter(
+            (shape) => shape.type === 'imageref'
+          ).length
+          if (currentImageRefs >= 5) {
+            toast.error('You can add up to 5 image reference boxes')
+          } else {
+            dispatch(addImageRef({ x, y, w, h }))
+          }
         }
       }
       draftShapeRef.current = null
@@ -926,7 +962,8 @@ export const useInfiniteCanvas = () => {
       if (
         shape.type === 'frame' ||
         shape.type === 'rect' ||
-        shape.type === 'ellipse'
+        shape.type === 'ellipse' ||
+        shape.type === 'imageref'
       ) {
         dispatch(
           updateShape({
@@ -1197,55 +1234,105 @@ export const useFrame = (shape: FrameShape) => {
   // 🎨 GENERATE DESIGN - The main function that converts frame to UI design
   const handleGenerateDesign = async () => {
     try {
-      setIsGenerating(true)
-
+      setIsGenerating(true);
+    
       // 📸 CAPTURE FRAME SNAPSHOT - Convert the frame and its contents to an image
       // This creates a visual representation of the wireframe that the AI can understand
-      const snapshot = await generateFrameSnapshot(shape, allShapes)
-      console.log('✅ Frame snapshot generated:', {
+      const snapshot = await generateFrameSnapshot(shape, allShapes);
+      console.log("✅ Frame snapshot generated:", {
         size: snapshot.size,
         type: snapshot.type,
-      })
-
+      });
+    
       // 💾 DOWNLOAD SNAPSHOT - Also save the snapshot for debugging/reference
-      downloadBlob(snapshot, `frame-${shape.frameNumber}-snapshot.png`)
+      downloadBlob(snapshot, `frame-${shape.frameNumber}-snapshot.png`);
 
+      const shapesInFrame = getShapesInsideFrame(allShapes, shape);
+      const imageRefs = shapesInFrame.filter(
+        (item): item is ImageRefShape =>
+          item?.type === "imageref" && !!item.imageDataUrl
+      );
+    
       // 📤 PREPARE API REQUEST - Create the data to send to the AI
-      const formData = new FormData()
-      formData.append('image', snapshot, `frame-${shape.frameNumber}.png`)
-      formData.append('frameNumber', shape.frameNumber.toString())
-
-      // 🔗 ADD PROJECT CONTEXT - Include project ID for AI context
-      const urlParams = new URLSearchParams(window.location.search)
-      const projectId = urlParams.get('project')
+      const formData = new FormData();
+      formData.append("image", snapshot, `frame-${shape.frameNumber}.png`);
+      formData.append("frameNumber", shape.frameNumber.toString());
+    
+      // 🔗 ADD PROJECT CONTEXT - Include project ID for AI + later Brand validation
+      let projectId: string | null = null;
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        projectId = urlParams.get("project");
+      }
       if (projectId) {
-        formData.append('projectId', projectId)
+        formData.append("projectId", projectId);
+      }
+    
+      // 🎚️ BRAND INFLUENCE & PALETTE CONTEXT
+      // Read the Brand influence slider + active palette from localStorage (if available)
+      let brandInfluence = 75;
+      let paletteId: string | null = null;
+    
+      if (typeof window !== "undefined") {
+        const storedInfluence = window.localStorage.getItem("brandInfluence");
+        if (storedInfluence !== null) {
+          const parsed = Number(storedInfluence);
+          if (!Number.isNaN(parsed)) {
+            brandInfluence = Math.min(100, Math.max(0, parsed));
+          }
+        }
+      
+        const storedPaletteId = window.localStorage.getItem("brandPaletteId");
+        if (storedPaletteId) {
+          paletteId = storedPaletteId;
+        }
+      }
+    
+      formData.append("brandInfluence", String(brandInfluence));
+      if (paletteId) {
+        formData.append("paletteId", paletteId);
       }
 
-      // 🚀 SEND TO AI - Request UI generation from the AI service
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        body: formData,
-      })
+      if (imageRefs.length > 0) {
+        const normalizedRefs = imageRefs.slice(0, 5).map((ref, index) => ({
+          fileName: ref.fileName ?? `image-ref-${index + 1}`,
+          dataUrl: ref.imageDataUrl,
+          bounds: {
+            x: (ref.x - shape.x) / shape.w,
+            y: (ref.y - shape.y) / shape.h,
+            w: ref.w / shape.w,
+            h: ref.h / shape.h,
+          },
+          absoluteBounds: { x: ref.x, y: ref.y, w: ref.w, h: ref.h },
+        }));
 
+        formData.append("imageRefs", JSON.stringify(normalizedRefs));
+      }
+    
+      // 🚀 SEND REQUEST - Call the AI generation endpoint
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        body: formData,
+      });
+    
       if (!response.ok) {
-        const errorText = await response.text()
+        const errorText = await response.text();
         throw new Error(
           `API request failed: ${response.status} ${response.statusText} - ${errorText}`
-        )
+        );
       }
-
-      // 📍 POSITION GENERATED UI - Place the new UI design next to the frame
+    
+      // 📍 POSITION GENERATED UI - Place the new UI to the right of the frame
       const generatedUIPosition = {
         x: shape.x + shape.w + 50, // 50px spacing from frame
         y: shape.y,
         w: Math.max(400, shape.w), // At least 400px wide, or frame width if larger
         h: Math.max(300, shape.h), // At least 300px high, or frame height if larger
-      }
-
+      };
+    
       // 🆔 CREATE GENERATED UI SHAPE - Add the new shape to the canvas immediately
-      const generatedUIId = nanoid()
-
+      const generatedUIId = nanoid();
+    
       // Create the generated UI shape immediately with empty content (like v0/lovable)
       dispatch(
         addGeneratedUI({
@@ -1254,60 +1341,110 @@ export const useFrame = (shape: FrameShape) => {
           uiSpecData: null, // Start with null for live rendering
           sourceFrameId: shape.id,
         })
-      )
-
+      );
+    
       // 📡 STREAM RESPONSE - Handle the AI's streaming response
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      let accumulatedMarkup = ''
-
-      let lastUpdateTime = 0
-      const UPDATE_THROTTLE_MS = 200 // Update every 200ms to reduce flickering
-
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedMarkup = "";
+    
+      let lastUpdateTime = 0;
+      const UPDATE_THROTTLE_MS = 200; // Update every 200ms to reduce flickering
+    
       if (reader) {
         try {
           while (true) {
-            const { done, value } = await reader.read()
+            const { done, value } = await reader.read();
             if (done) {
               // Update with final accumulated markup
-              dispatch(
-                updateShape({
-                  id: generatedUIId,
-                  patch: { uiSpecData: accumulatedMarkup },
-                })
-              )
-              break
+              if (accumulatedMarkup) {
+                dispatch(
+                  updateShape({
+                    id: generatedUIId,
+                    patch: { uiSpecData: accumulatedMarkup },
+                  })
+                );
+              }
+              break;
             }
-
-            const chunk = decoder.decode(value)
-            accumulatedMarkup += chunk
-
-            // Update with partial markup for live rendering
-            const now = Date.now()
+          
+            accumulatedMarkup += decoder.decode(value, { stream: true });
+          
+            // Update with partial markup for live rendering (throttled)
+            const now = Date.now();
             if (now - lastUpdateTime >= UPDATE_THROTTLE_MS) {
               dispatch(
                 updateShape({
                   id: generatedUIId,
                   patch: { uiSpecData: accumulatedMarkup },
                 })
-              )
-              lastUpdateTime = now
-            } else {
+              );
+              lastUpdateTime = now;
             }
           }
         } finally {
-          reader.releaseLock()
+          reader.releaseLock();
+        }
+      }
+    
+      // 🧮 BRAND VALIDATION - Score this generated UI against BrandKit
+      if (projectId && accumulatedMarkup.trim().length > 0) {
+        try {
+          const validationResponse = await fetch("/api/brand/validate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              projectId,
+              generatedUIId,
+              html: accumulatedMarkup,
+              brandInfluence,
+              paletteId,
+            }),
+          });
+        
+          if (validationResponse.ok) {
+            const data = await validationResponse.json();
+            if (data && data.metrics) {
+              dispatch(
+                updateShape({
+                  id: generatedUIId,
+                  patch: { brandMetrics: data.metrics },
+                })
+              );
+            }
+          } else {
+            // Non-fatal: just log and continue
+            console.warn(
+              "Brand validation request failed:",
+              validationResponse.status,
+              validationResponse.statusText
+            );
+          }
+        } catch (err) {
+          console.warn("Brand validation error:", err);
         }
       }
     } catch (error) {
-      // Show user-friendly error message
-      toast(
-        `Failed to generate UI design: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
+      const message =
+        error instanceof Error ? error.message : "Unknown error";
+    
+      // Special case: style guide is missing
+      // Backend error looks like: "Cannot read properties of null (reading 'colorSections')"
+      if (message.includes("colorSections")) {
+        toast(
+          "Generate a style guide first from the Style Guide tab, then try generating a UI design."
+        );
+      } else {
+        // Fallback generic error
+        toast(`Failed to generate UI design: ${message}`);
+      }
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
+
 
   return {
     isGenerating,

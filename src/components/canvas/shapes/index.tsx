@@ -7,6 +7,7 @@ import { Arrow } from "./arrow";
 import { Line } from "./line";
 import { Text } from "./text";
 import { GeneratedUI } from "./generatedui";
+import { ImageRef } from "./imageref";
 
 export const ShapeRenderer = ({
   shape,
@@ -30,6 +31,8 @@ export const ShapeRenderer = ({
       return <Elipse shape={shape} />;
     case "freedraw":
       return <Stroke shape={shape} />;
+    case "imageref":
+      return <ImageRef shape={shape} />;
     case "arrow":
       return <Arrow shape={shape} />;
     case "line":

@@ -1,17 +1,27 @@
 import { RectShape } from "@/redux/slice/shapes";
 
-export const Rectangle = ({ shape }: { shape: RectShape }) => (
-  <div
-    className="absolute border-solid pointer-events-none"
-    style={{
-      left: shape.x,
-      top: shape.y,
-      width: shape.w,
-      height: shape.h,
-      borderColor: shape.stroke,
-      borderWidth: shape.strokeWidth,
-      backgroundColor: shape.fill ?? "transparent",
-      borderRadius: "8px", // Add rounded corners
-    }}
-  />
-);
+export const Rectangle = ({ shape }: { shape: RectShape }) => {
+  
+  const stroke =
+  !shape.stroke || shape.stroke === "#ffffff" || shape.stroke === "#fff"
+    ? "var(--canvas-stroke)"
+    : shape.stroke;
+  const fill = shape.fill || "transparent";
+
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        left: shape.x,
+        top: shape.y,
+        width: shape.w,
+        height: shape.h,
+        borderColor: stroke,
+        borderWidth: shape.strokeWidth,
+        borderStyle: "solid",
+        backgroundColor: fill,
+        borderRadius: "8px",
+      }}
+    />
+  );
+};

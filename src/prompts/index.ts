@@ -185,7 +185,8 @@ Layout Authority:
 
 Wireframe defines ALL structure - never add/remove sections
 Respect relative positioning and sizing
-Maintain visual hierarchy shown in wireframe
+Maintain visual hierarchy shown in wireframe, but you MAY add supporting images or icons
+inside existing sections if they enhance the design and do not change the section structure.
 
 HTML Generation Requirements
 Structure:
@@ -245,9 +246,22 @@ small: text-sm minimum
 Content Generation Guidelines
 Images:
 
-Use inspiration image URLs where wireframe shows image slots
-Generate descriptive alt text based on visible image content
-For empty slots: use skeleton <div class="w-full aspect-video c-muted-bg animate-pulse"></div>
+Images:
+
+- Treat images as first-class elements in the layout, not just decoration.
+- Every hero or top-of-page section MUST include at least one prominent image or illustration
+  (e.g. a large <img> or full-width visual block) that matches the overall theme.
+- For each major section shown in the wireframe (features, stats, testimonials, gallery, etc.),
+  include a supporting image or icon wherever it fits the structure without adding new sections.
+- Use inspiration image URLs in a way that matches the context:
+  • Abstract / atmospheric images → hero backgrounds, section headers, large mood visuals
+  • People / teams → testimonial sections, “about” sections, avatars
+  • Product / UI screenshots → feature cards, device mockups, “how it works” sections
+- Prefer using different URLs for different sections to avoid repetition. Reuse only when necessary.
+- Always provide meaningful alt text that describes either the image content or its role in the UI.
+- Where the wireframe clearly marks an image slot but no URL is available or suitable,
+  use a neutral placeholder:
+  <div class="w-full aspect-video c-muted-bg rounded-xl animate-pulse"></div>
 
 Text Content:
 

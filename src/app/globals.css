@@ -112,6 +112,21 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+/* Freeform-style subtle dot grid for InfiniteCanvas */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+}
+
+:root {
+  --canvas-stroke: #111111;  /* light mode black */
+}
+
+.dark {
+  --canvas-stroke: #ffffff;  /* dark mode white */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -120,3 +135,5 @@
     @apply bg-background text-foreground;
   }
 }
+
+

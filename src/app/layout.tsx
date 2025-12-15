@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
+
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { ConvexClientProvider } from "@/convex/provider";
 import { ThemeProvider } from "@/theme/provider";
 import { ReduxProvider } from "@/redux/provider";
 import { Toaster } from "sonner";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { ConvexClientProvider } from "@/convex/provider";
 import { ProfileQuery } from "@/convex/query.config";
 import { normalizeProfile, ConvexUserRaw } from "@/types/user";
 
@@ -35,24 +36,26 @@ export default async function RootLayout({
   );
 
   return (
-    <ConvexAuthNextjsServerProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <ConvexClientProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ConvexAuthNextjsServerProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ConvexClientProvider>
               <ReduxProvider preloadedState={{ profile }}>
                 {children}
                 <Toaster />
               </ReduxProvider>
-            </ThemeProvider>
-          </ConvexClientProvider>
-        </body>
-      </html>
-    </ConvexAuthNextjsServerProvider>
+            </ConvexClientProvider>
+          </ThemeProvider>
+        </ConvexAuthNextjsServerProvider>
+      </body>
+    </html>
   );
 }

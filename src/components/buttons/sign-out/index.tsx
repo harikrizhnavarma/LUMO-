@@ -12,8 +12,13 @@ export const SignOutButton = () => {
       onClick={handleSignOut}
       size="lg"
       variant="default"
-      className="rounded-full h-12 w-12 flex items-center justify-center">
-      <LogOut size={16} />
+      className="rounded-full h-12 w-12 flex items-center justify-center
+                 text-neutral-700 dark:text-white"
+    >
+      <LogOut
+        size={16}
+        className="text-neutral-700 dark:text-white"
+      />
     </LiquidGlassButton>
   );
 };

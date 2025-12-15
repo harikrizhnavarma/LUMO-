@@ -1,45 +1,42 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 interface AutosaveProjectRequest {
-  projectId: string
-  userId: string
+  projectId: string;
+  userId: string;
   shapesData: {
-    shapes: Record<string, unknown>
-    tool: string
-    selected: Record<string, unknown>
-    frameCounter: number
-  }
+    shapes: Record<string, unknown>;
+    tool: string;
+    selected: Record<string, unknown>;
+    frameCounter: number;
+  };
   viewportData?: {
-    scale: number
-    translate: { x: number; y: number }
-  }
+    scale: number;
+    translate: { x: number; y: number };
+  };
 }
 
 interface AutosaveProjectResponse {
-  success: boolean
-  message: string
-  eventId: string
+  success: boolean;
+  message?: string;
 }
 
 export const ProjectApi = createApi({
-  reducerPath: 'projectApi',
+  reducerPath: "projectApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api/project',
+    baseUrl: "/api/project",
   }),
-  tagTypes: ['Project'],
   endpoints: (builder) => ({
-    // Autosave project
     autosaveProject: builder.mutation<
       AutosaveProjectResponse,
       AutosaveProjectRequest
     >({
       query: (data) => ({
-        url: '',
-        method: 'PATCH',
+        url: "",
+        method: "PATCH",
         body: data,
       }),
     }),
   }),
-})
+});
 
-export const { useAutosaveProjectMutation } = ProjectApi
+export const { useAutosaveProjectMutation } = ProjectApi;

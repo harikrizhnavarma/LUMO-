@@ -1,0 +1,258 @@
+NPX
+project_name: project_lumo
+
+🧩 Step 1 — BrandKit “brain” and data structure
+
+Goal: Give the app a place to store and think about brands, not just projects.
+
+What we added conceptually
+
+A BrandKit profile per brand:
+
+What tier it is (Personal / Professional / Enterprise / Collaborative).
+
+Space to store:
+
+Brand DNA (how the brand looks and feels).
+
+Training library stats (how many images, what types).
+
+Rules (what’s allowed / not allowed).
+
+Analytics (scores, trends, etc.).
+
+What changed in the code (high level)
+
+Created shared BrandKit types so front-end & back-end “talk the same language” about:
+
+Brand DNA
+
+Rules engine
+
+Analytics & consistency metrics
+
+Extended Convex schema to support BrandKit tables (things like brand_kits, training images, analytics snapshots).
+
+Updated providers / queries so when you load a brand or project, the app can also load its BrandKit profile.
+
+What you actually feel as a user (now)
+
+Nothing huge visually yet.
+
+But under the hood, the app now understands:
+
+“This brand has a BrandKit profile and can have its own DNA, rules, analytics.”
+
+That’s the backbone for all the smart stuff that came later.
+
+🧬 Step 2 — Brand DNA Engine (training + using it to generate UI)
+
+Goal: Let the AI actually learn the brand from images and then enforce that brand when generating UI.
+
+1) Training the Brand DNA from your moodboard
+
+When you click “Generate Style Guide” for a project:
+
+We now:
+
+Take your moodboard images for that project.
+
+Send them to the AI with a detailed instruction.
+
+AI returns a big JSON object that includes:
+
+A style guide (colors, typography).
+
+Brand DNA:
+
+Visual language (forms, proportions, materials, lighting, composition, detail density).
+
+Personality (tone, ethos, target audience, values, positioning).
+
+A Brand Rules Engine:
+
+Mandatory rules (hard constraints).
+
+Guidance rules (soft preferences).
+
+Context rules (per product type / region / season).
+
+Baseline scores:
+
+How coherent the training set is: color fidelity, form language, composition, etc.
+
+Training metadata (how many images, quality notes).
+
+We save this entire thing into the project’s style guide in Convex.
+
+So now a project doesn’t just have “colors + fonts”, it has a Brand DNA pack attached to it.
+
+2) Using Brand DNA when generating UI
+
+When you generate UI from a sketch:
+
+The /api/generate endpoint now:
+
+Loads the style guide + Brand DNA + rules + baseline.
+
+Builds a very rich system prompt that tells the model:
+
+Exactly what the brand looks like.
+
+What rules must never be broken.
+
+What is allowed to bend.
+
+What the baseline quality is.
+
+Uses this context + your sketch + inspiration images to generate HTML.
+
+So from Step 2 onwards, the AI isn’t just “making something pretty” — it’s trying to stay in character as your brand.
+
+3) Small fix
+
+We also fixed a small bug in use-styles around moodboard image upload error handling, so the form doesn’t crash when uploads fail.
+
+🎨 Step 3 — Palette system (backend only)
+
+Goal: Implement “HOW it renders” separate from “WHAT the brand is”, exactly like your spec: Brand DNA vs Palette.
+
+What we created
+
+Palette data model
+
+A palette has:
+
+Name & type (Studio_Pristine, Environment_Track, etc.).
+
+Swatches (each with hex color, role, description).
+
+Strictness (0–100 → how tightly it should be enforced).
+
+Training config (where it came from, how many images, emphasis areas).
+
+Usage stats (how often used, avg brand score).
+
+Convex tables
+
+New brand_palettes table to store palettes per brand/project.
+
+Existing BrandKit tables extended to support analytics / training info.
+
+Convex functions
+
+Get palettes for a brand/project.
+
+Save / update palette (including setting default).
+
+Delete palette.
+
+Set default palette for a brand.
+
+Palette training API
+
+New endpoint: /api/brand/palettes/train
+
+What it does:
+
+Uses moodboard images as the training data.
+
+Asks AI to produce:
+
+A palette name & description.
+
+4–24 swatches with roles + descriptions.
+
+Training notes.
+
+Saves it to brand_palettes in Convex with training metadata.
+
+What you see right now
+
+No visible UI yet (no palette list, no button).
+
+But the system now supports:
+
+Training and storing palettes.
+
+Later, we can easily add “Train palette from moodboard” and a palette picker.
+
+Think of Step 3 as wiring the engine and fuel tank for palettes, but not yet putting the controls on the dashboard.
+
+🕹 Step 4 — Brand Influence slider + wiring into generation
+
+Goal: Give you a simple control to decide how strictly the AI should follow BrandKit during generation — and pass that value into the model every time.
+
+1) New UI: Brand Influence bar
+
+On the Canvas page:
+
+We added a “Brand influence” bar (below the top navbar):
+
+A slider from 0%–100%.
+
+A short description:
+
+0% = free exploration.
+
+100% = strict BrandKit.
+
+The value is stored in localStorage, so it stays the same when you refresh on that device.
+
+2) Wiring into /api/generate
+
+We changed the places where your app calls /api/generate to:
+
+Read from localStorage:
+
+brandInfluence (slider value).
+
+brandPaletteId (placeholder for when we build a palette picker).
+
+Attach them into the FormData as:
+
+brandInfluence
+
+paletteId (if present)
+
+Specifically:
+
+In the frame generation hook (useFrame in use-canvas.ts).
+
+In the frame snapshot helper (sendFrameToAPI in frame-snapshot.ts).
+
+Because /api/generate already understands brandInfluence from Step 2, this value now actually changes the model’s behaviour:
+
+Lower influence:
+
+The model can experiment more (within aesthetic reason).
+
+Higher influence:
+
+The model is told to be more faithful to:
+
+Brand DNA
+
+Brand Rules
+
+Style guide tokens.
+
+3) What’s not visible yet
+
+We aren’t showing palettes or letting you pick one in the UI yet (even though the backend can handle it).
+
+We also aren’t showing brand scores / warnings yet — that’s for the Brand Consistency / Guardian phase.
+
+TL;DR of Steps 1–4
+
+Step 1: Built the BrandKit brain & storage: brand profiles, DNA slots, rules, analytics tables.
+
+Step 2: Taught AI to learn Brand DNA from moodboards and use it when generating UI.
+
+Step 3: Built the palette system (backend) so we can train/render “visual moods” separate from core DNA.
+
+Step 4: Gave you a Brand Influence slider on the canvas and wired it so every generation knows how strict to be with BrandKit.
+
+So right now you have:
+
+A project that can train its Brand DNA from images, a generation pipeline that respects that DNA, an engine ready for palettes, and a visible slider to control how “on-brand” the AI should be.

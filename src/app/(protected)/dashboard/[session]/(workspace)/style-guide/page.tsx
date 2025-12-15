@@ -7,6 +7,7 @@ import { MoodBoardImagesQuery, StyleGuideQuery } from "@/convex/query.config";
 import StyleGuideTypography from "@/components/style/typography";
 import { MoodBoardImage } from "@/hooks/use-styles";
 import { ThemeContent } from "@/components/style/theme";
+import { BrandPalettesPanel } from "@/components/style/palettes";
 
 type Props = {
   searchParams: Promise<{
@@ -19,7 +20,7 @@ const Page = async ({ searchParams }: Props) => {
 
   const existingStyleGuide = await StyleGuideQuery(projectId);
   const guide = existingStyleGuide.styleGuide
-    ?._valueJSON as unknown as StyleGuide;
+    ?._valueJSON as unknown as StyleGuide | null;
 
   const colorGuide = guide?.colorSections || [];
   const typographyGuide = guide?.typographySections || [];
@@ -47,7 +48,15 @@ const Page = async ({ searchParams }: Props) => {
             </div>
           </div>
         ) : (
-          <ThemeContent colorGuide={colorGuide} />
+          <div className="space-y-8">
+            <ThemeContent colorGuide={colorGuide} />
+
+            {/* New: Brand palettes panel (Step 5) */}
+            <BrandPalettesPanel
+              projectId={projectId}
+              colorGuide={colorGuide}
+            />
+          </div>
         )}
       </TabsContent>
 

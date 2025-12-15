@@ -17,6 +17,7 @@ export const SelectionOverlay = ({
       case 'frame':
       case 'rect':
       case 'ellipse':
+      case 'imageref':
       case 'generatedui':
         return {
           x: shape.x,
@@ -77,6 +78,7 @@ export const SelectionOverlay = ({
     shape.type === 'frame' ||
     shape.type === 'rect' ||
     shape.type === 'ellipse' ||
+    shape.type === 'imageref' ||
     shape.type === 'freedraw' ||
     shape.type === 'line' ||
     shape.type === 'arrow' ||

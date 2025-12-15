@@ -23,7 +23,14 @@ export const Arrow = ({ shape }: { shape: ArrowShape }) => {
   const { startX, startY, endX, endY } = shape;
   const arrowHead = calculateArrowHead(startX, startY, endX, endY, 12);
 
-  // Calculate bounding box for the SVG
+  // Theme-aware stroke color
+  const stroke =
+   !shape.stroke || shape.stroke === "#ffffff" || shape.stroke === "#fff"
+     ? "var(--canvas-stroke)"
+     : shape.stroke;
+
+
+  // Bounding box
   const minX = Math.min(startX, endX, arrowHead.x1, arrowHead.x2) - 5;
   const minY = Math.min(startY, endY, arrowHead.y1, arrowHead.y2) - 5;
   const maxX = Math.max(startX, endX, arrowHead.x1, arrowHead.x2) + 5;
@@ -33,27 +40,30 @@ export const Arrow = ({ shape }: { shape: ArrowShape }) => {
 
   return (
     <svg
-      className="absolute pointer-events-none"
+      className="absolute pointer-events-none z-10"
       style={{
         left: minX,
         top: minY,
         width,
         height,
       }}
-      aria-hidden>
+      aria-hidden
+    >
       <line
         x1={startX - minX}
         y1={startY - minY}
         x2={endX - minX}
         y2={endY - minY}
-        stroke={shape.stroke}
+        stroke={stroke}
         strokeWidth={shape.strokeWidth}
         strokeLinecap="round"
       />
       <polygon
-        points={`${endX - minX},${endY - minY} ${arrowHead.x1 - minX},${arrowHead.y1 - minY} ${arrowHead.x2 - minX},${arrowHead.y2 - minY}`}
-        fill={shape.stroke}
-        stroke={shape.stroke}
+        points={`${endX - minX},${endY - minY} ${arrowHead.x1 - minX},${
+          arrowHead.y1 - minY
+        } ${arrowHead.x2 - minX},${arrowHead.y2 - minY}`}
+        fill={stroke}
+        stroke={stroke}
         strokeWidth={1}
         strokeLinejoin="round"
       />

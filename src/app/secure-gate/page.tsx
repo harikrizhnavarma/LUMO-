@@ -91,7 +91,7 @@ const Page = () => {
           <p className="text-xs uppercase tracking-[0.3em] text-white/60">Private beta access</p>
           <h1 className="text-3xl font-semibold sm:text-4xl">Secure Gate</h1>
           <p className="text-sm text-white/70">
-            Enter the email you used on the waitlist. We&apos;ll send a 6-digit code to unlock sign-in.
+            Please enter your email. We&apos;ll send a 6-digit code to unlock sign-in.
           </p>
         </div>
 

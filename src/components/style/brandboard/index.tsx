@@ -58,9 +58,9 @@ export const Brandboard: React.FC<Props> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [isGeneratingMarks, setIsGeneratingMarks] = useState(false);
   const [marks, setMarks] = useState<{
-    logo?: string;
-    monogram?: string;
-    submark?: string;
+    logo?: string | null;
+    monogram?: string | null;
+    submark?: string | null;
   }>({});
   const [templateIndex, setTemplateIndex] = useState(0);
   const [tileSize, setTileSize] = useState(180);
@@ -98,7 +98,7 @@ export const Brandboard: React.FC<Props> = ({
     );
   }, [images, tileSize]);
 
-  const svgToDataUrl = (svg?: string) => {
+  const svgToDataUrl = (svg?: string | null) => {
     if (!svg) return null;
     const encoded = encodeURIComponent(svg);
     return `data:image/svg+xml;utf8,${encoded}`;

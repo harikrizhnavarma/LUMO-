@@ -33,6 +33,11 @@ const tabs = [
     label: "Moodboard",
     icon: LayoutIcon,
   },
+  {
+    value: "brandboard",
+    label: "Brandboard",
+    icon: LayoutIcon,
+  },
 ] as const;
 
 const Layout = async ({ children }: Props) => {
@@ -50,7 +55,7 @@ const Layout = async ({ children }: Props) => {
               </p>
             </div>
 
-            <TabsList className="grid w-full sm:w-fit h-auto grid-cols-3 rounded-full backdrop-blur-xl bg-white/[0.08] border border-white/[0.12] saturate-150 p-2">
+            <TabsList className="grid w-full sm:w-fit h-auto grid-cols-4 rounded-full backdrop-blur-xl bg-white/[0.08] border border-white/[0.12] saturate-150 p-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (

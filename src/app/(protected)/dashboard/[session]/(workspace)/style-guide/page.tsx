@@ -3,11 +3,16 @@ import { TabsContent } from "@/components/ui/tabs";
 import type { StyleGuide } from "@/redux/api/style-guide";
 import { MoodBoard } from "@/components/style/mood-board";
 import { Palette } from "lucide-react";
-import { MoodBoardImagesQuery, StyleGuideQuery } from "@/convex/query.config";
+import {
+  MoodBoardImagesQuery,
+  ProjectQuery,
+  StyleGuideQuery,
+} from "@/convex/query.config";
 import StyleGuideTypography from "@/components/style/typography";
 import { MoodBoardImage } from "@/hooks/use-styles";
 import { ThemeContent } from "@/components/style/theme";
 import { BrandPalettesPanel } from "@/components/style/palettes";
+import Brandboard from "@/components/style/brandboard";
 
 type Props = {
   searchParams: Promise<{
@@ -18,6 +23,7 @@ type Props = {
 const Page = async ({ searchParams }: Props) => {
   const projectId = (await searchParams).project;
 
+  const { project } = await ProjectQuery(projectId);
   const existingStyleGuide = await StyleGuideQuery(projectId);
   const guide = existingStyleGuide.styleGuide
     ?._valueJSON as unknown as StyleGuide | null;
@@ -28,6 +34,18 @@ const Page = async ({ searchParams }: Props) => {
   const existingMoodBoardImages = await MoodBoardImagesQuery(projectId);
   const guideImages = existingMoodBoardImages.images
     ._valueJSON as unknown as MoodBoardImage[];
+  const brandboardImages = guideImages.map((img) => ({
+    ...img,
+    // Ensure Next/Image receives a non-empty src; Convex query returns `url`, hook returns `preview`
+    preview:
+      (img as any).preview && typeof (img as any).preview === "string"
+        ? (img as any).preview
+        : (img as any).url ?? "",
+  }));
+  const projectName =
+    project?._valueJSON && "name" in project._valueJSON
+      ? (project._valueJSON.name as string)
+      : undefined;
 
   return (
     <div>
@@ -62,6 +80,15 @@ const Page = async ({ searchParams }: Props) => {
 
       <TabsContent value="typography">
         <StyleGuideTypography typographyGuide={typographyGuide} />
+      </TabsContent>
+
+      <TabsContent value="brandboard">
+        <Brandboard
+          projectId={projectId}
+          brandName={projectName ?? guide?.theme}
+          styleGuide={guide}
+          moodboardImages={brandboardImages}
+        />
       </TabsContent>
 
       <TabsContent value="moodboard">

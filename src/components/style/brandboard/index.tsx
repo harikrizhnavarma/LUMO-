@@ -120,11 +120,15 @@ export const Brandboard: React.FC<Props> = ({
       if (!res.ok || !data?.success) {
         throw new Error(data?.message || 'Failed to generate marks');
       }
-      const { logoSvg, monogramSvg, submarkSvg } = data.marks || {};
+      const { logoSvg, monogramSvg, submarkSvg } = (data.marks || {}) as {
+        logoSvg?: string | null;
+        monogramSvg?: string | null;
+        submarkSvg?: string | null;
+      };
       setMarks({
-        logo: svgToDataUrl(logoSvg),
-        monogram: svgToDataUrl(monogramSvg),
-        submark: svgToDataUrl(submarkSvg),
+        logo: svgToDataUrl(logoSvg ?? undefined),
+        monogram: svgToDataUrl(monogramSvg ?? undefined),
+        submark: svgToDataUrl(submarkSvg ?? undefined),
       });
       toast.success('Brand marks generated');
     } catch (err) {

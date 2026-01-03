@@ -42,9 +42,13 @@ const Page = async ({ searchParams }: Props) => {
         ? (img as any).preview
         : (img as any).url ?? "",
   }));
+  const projectRecord = project?._valueJSON as
+    | Record<string, unknown>
+    | null
+    | undefined;
   const projectName =
-    project?._valueJSON && "name" in project._valueJSON
-      ? (project._valueJSON.name as string)
+    projectRecord && typeof projectRecord.name === "string"
+      ? (projectRecord.name as string)
       : undefined;
 
   return (

@@ -194,7 +194,12 @@ const createZipBlob = (
     localOffset
   );
 
-  return new Blob([...localParts, ...centralParts, endRecord], {
+  const blobParts = [
+    ...localParts,
+    ...centralParts,
+    endRecord,
+  ] as unknown as BlobPart[];
+  return new Blob(blobParts, {
     type: "application/zip",
   });
 };

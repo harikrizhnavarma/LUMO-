@@ -376,7 +376,7 @@ const buildProjectFiles = (htmlSource: string) => {
   const sectionImports = sectionComponents
     .map(
       (section) =>
-        `import { ${section.componentName} } from "@/components/sections/${section.componentName}";`
+        `import { ${section.componentName} } from "../components/sections/${section.componentName}";`
     )
     .join("\n");
 
@@ -469,6 +469,7 @@ export const useTheme = () => {
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
     "postcss": "^8",
     "autoprefixer": "^10",
@@ -503,7 +504,7 @@ module.exports = nextConfig;
 `,
     "postcss.config.js": `module.exports = {
   plugins: {
-    tailwindcss: {},
+    "@tailwindcss/postcss": {},
     autoprefixer: {},
   },
 };

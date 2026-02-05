@@ -136,4 +136,18 @@
   }
 }
 
+.generated-ui-viewport [data-generated-ui] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.generated-ui-viewport [data-generated-ui] img,
+.generated-ui-viewport [data-generated-ui] svg,
+.generated-ui-viewport [data-generated-ui] video,
+.generated-ui-viewport [data-generated-ui] canvas {
+  max-width: 100%;
+  height: auto;
+}
+
 

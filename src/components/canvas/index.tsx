@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useInfiniteCanvas,
-  useInspiration,
-  useGlobalChat,
-} from "@/hooks/use-canvas";
+import { useInfiniteCanvas, useInspiration } from "@/hooks/use-canvas";
 import { cn } from "@/lib/utils";
 import { ShapeRenderer } from "./shapes";
 import { FramePreview } from "./shapes/frame/preview";
@@ -18,9 +14,16 @@ import { LinePreview } from "./shapes/line/preview";
 import { SelectionOverlay } from "./shapes/selection";
 import { TextSidebar } from "./text-sidebar";
 import { InspirationSidebar } from "./shapes/inspiration-sidebar";
-import { ChatWindow } from "./shapes/generatedui/chat";
 
-export const InfiniteCanvas = () => {
+export const InfiniteCanvas = ({
+  toggleChat,
+  generateWorkflow,
+  exportDesign,
+}: {
+  toggleChat: (generatedUIId: string) => void;
+  generateWorkflow: (generatedUIId: string) => void;
+  exportDesign: (generatedUIId: string, element: HTMLElement | null) => void;
+}) => {
   const {
     viewport,
     shapes,
@@ -40,17 +43,9 @@ export const InfiniteCanvas = () => {
   const { isInspirationOpen, closeInspiration, toggleInspiration } =
     useInspiration();
 
-  const {
-    isChatOpen,
-    activeGeneratedUIId,
-    closeChat,
-    toggleChat,
-    generateWorkflow,
-    exportDesign,
-  } = useGlobalChat();
-
   const draftShape = getDraftShape();
   const freeDrawPoints = getFreeDrawPoints();
+  const renderShapes = shapes.filter((shape) => shape.type !== "generatedui");
 
   return (
     <>
@@ -60,14 +55,6 @@ export const InfiniteCanvas = () => {
         isOpen={isInspirationOpen}
         onClose={closeInspiration}
       />
-
-      {activeGeneratedUIId && (
-        <ChatWindow
-          generatedUIId={activeGeneratedUIId}
-          isOpen={isChatOpen}
-          onClose={closeChat}
-        />
-      )}
 
       <div
         ref={attachCanvasRef}
@@ -112,7 +99,7 @@ export const InfiniteCanvas = () => {
             willChange: "transform",
           }}
         >
-          {shapes.map((shape) => (
+          {renderShapes.map((shape) => (
             <ShapeRenderer
               key={shape.id}
               shape={shape}
@@ -124,7 +111,7 @@ export const InfiniteCanvas = () => {
           ))}
 
           {/* Selection overlays */}
-          {shapes.map((shape) => (
+          {renderShapes.map((shape) => (
             <SelectionOverlay
               key={`selection-${shape.id}`}
               shape={shape}

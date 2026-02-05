@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { CircleQuestionMark, Hash, LayoutTemplate, User } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CircleQuestionMark, Hash, LayoutTemplate, User, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
@@ -32,6 +32,8 @@ export const Navbar = () => {
 
   const hasCanvas = pathname.includes("canvas");
   const hasStyleGuide = pathname.includes("style-guide");
+  const [toolbarVisible, setToolbarVisible] = useState(true);
+  const [previewOpen, setPreviewOpen] = useState(true);
 
   const showTabs = !!projectId && (hasCanvas || hasStyleGuide);
   const showProjectContext = showTabs;
@@ -46,6 +48,47 @@ export const Navbar = () => {
   if (!me) {
     return null;
   }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("toolbarVisible");
+    if (stored !== null) {
+      setToolbarVisible(stored === "true");
+    }
+
+    const previewStored = window.localStorage.getItem("previewPanelOpen");
+    if (previewStored !== null) {
+      setPreviewOpen(previewStored === "true");
+    }
+
+    const handleStorage = () => {
+      const next = window.localStorage.getItem("toolbarVisible");
+      if (next !== null) {
+        setToolbarVisible(next === "true");
+      }
+      const nextPreview = window.localStorage.getItem("previewPanelOpen");
+      if (nextPreview !== null) {
+        setPreviewOpen(nextPreview === "true");
+      }
+    };
+
+    const handlePreviewState = (event: Event) => {
+      const detail = (event as CustomEvent<boolean>).detail;
+      if (typeof detail === "boolean") {
+        setPreviewOpen(detail);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("preview:state", handlePreviewState as EventListener);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener(
+        "preview:state",
+        handlePreviewState as EventListener
+      );
+    };
+  }, []);
 
   const tabs: TabProps[] = [
     {
@@ -144,6 +187,59 @@ export const Navbar = () => {
 
       {/* Right: actions */}
       <div className="flex items-center gap-4 justify-end">
+        {hasCanvas && (
+          <Button
+            variant="secondary"
+            className="rounded-full h-12 px-4 flex items-center justify-center 
+            border border-neutral-300 dark:border-white/20 
+            bg-neutral-100 dark:bg-transparent
+            text-neutral-700 dark:text-white
+            hover:bg-neutral-200 dark:hover:bg-white/10 transition"
+            onClick={() => {
+              const next = !previewOpen;
+              setPreviewOpen(next);
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("previewPanelOpen", String(next));
+                window.dispatchEvent(
+                  new CustomEvent("preview:set", { detail: next })
+                );
+              }
+            }}
+            title={previewOpen ? "Hide preview" : "Show preview"}
+          >
+            <LayoutTemplate className="size-5" />
+            <span className="ml-2 text-sm hidden lg:inline">
+              {previewOpen ? "Hide preview" : "Show preview"}
+            </span>
+          </Button>
+        )}
+
+        {hasCanvas && (
+          <Button
+            variant="secondary"
+            className="rounded-full h-12 px-4 flex items-center justify-center 
+            border border-neutral-300 dark:border-white/20 
+            bg-neutral-100 dark:bg-transparent
+            text-neutral-700 dark:text-white
+            hover:bg-neutral-200 dark:hover:bg-white/10 transition"
+            onClick={() => {
+              const next = !toolbarVisible;
+              setToolbarVisible(next);
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("toolbarVisible", String(next));
+                window.dispatchEvent(
+                  new CustomEvent("toolbar:set", { detail: next })
+                );
+              }
+            }}
+            title={toolbarVisible ? "Hide tools" : "Show tools"}
+          >
+            <Wrench className="size-5" />
+            <span className="ml-2 text-sm hidden lg:inline">
+              {toolbarVisible ? "Hide tools" : "Show tools"}
+            </span>
+          </Button>
+        )}
         <SignOutButton />
 
         <Button

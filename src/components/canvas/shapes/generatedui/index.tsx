@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { GeneratedUIShape } from "@/redux/slice/shapes";
 import { useUpdateContainer } from "@/hooks/use-styles";
 import { MessageCircle, Workflow, Download, Code2, Copy } from "lucide-react";
@@ -38,8 +38,14 @@ export const GeneratedUI = ({
   generateWorkflow: (generatedUIId: string) => void;
   exportDesign: (generatedUIId: string, element: HTMLElement | null) => void;
 }) => {
-  const { sanitizeHtml, containerRef } = useUpdateContainer(shape);
+  const { sanitizeHtml, containerRef } = useUpdateContainer(shape, {
+    syncHeight: false,
+  });
   const [showCodeActions, setShowCodeActions] = useState(false);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [contentScale, setContentScale] = useState(1);
+  const [contentSize, setContentSize] = useState({ width: 0, height: 0 });
 
   const metrics = shape.brandMetrics;
   const label =
@@ -57,6 +63,45 @@ export const GeneratedUI = ({
     () => (safeHtml ? buildTsxFromHtml(safeHtml) : ""),
     [safeHtml]
   );
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    const content = contentRef.current;
+    if (!viewport || !content) return;
+
+    let rafId = 0;
+    const updateScale = () => {
+      if (!viewportRef.current || !contentRef.current) return;
+      const viewportWidth = viewportRef.current.clientWidth;
+      const contentWidth = contentRef.current.scrollWidth;
+      const contentHeight = contentRef.current.scrollHeight;
+
+      if (!viewportWidth || !contentWidth) return;
+
+      const nextScale = Math.min(1, viewportWidth / contentWidth);
+      setContentScale(Number.isFinite(nextScale) ? nextScale : 1);
+      setContentSize({
+        width: contentWidth,
+        height: contentHeight,
+      });
+    };
+
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateScale);
+    };
+
+    updateScale();
+
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(viewport);
+    resizeObserver.observe(content);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+    };
+  }, [safeHtml, shape.w, shape.h]);
 
   const handleCopyCode = async () => {
     if (!tsxCode) return;
@@ -87,16 +132,17 @@ export const GeneratedUI = ({
         left: shape.x,
         top: shape.y,
         width: shape.w,
+        height: shape.h,
       }}
     >
       <div
         className="
-          w-full relative rounded-lg
-          border border-neutral-300 dark:border-white/20
-          bg-white/70 dark:bg-white/5
+          w-full h-full relative rounded-xl
+          border border-neutral-300/80 dark:border-white/15
+          bg-white/80 dark:bg-black/40
           backdrop-blur-xl
           shadow-md dark:shadow-none
-          p-4
+          overflow-hidden
         "
       >
         {/* Action buttons */}
@@ -166,17 +212,48 @@ export const GeneratedUI = ({
           </LiquidGlassButton>
         </div>
 
-        {/* Render generated HTML */}
-        {shape.uiSpecData ? (
-          <div
-            className="pointer-events-auto"
-            dangerouslySetInnerHTML={{ __html: safeHtml }}
-          />
-        ) : (
-          <div className="text-center text-neutral-600 dark:text-white/60 p-4 animate-pulse">
-            Generating…
+        <div className="flex h-full flex-col pointer-events-auto">
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-neutral-200/70 dark:border-white/10 bg-white/70 dark:bg-black/20">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400/90" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
+            </div>
+            <div className="text-xs text-neutral-500 dark:text-white/60">
+              {shape.isWorkflowPage ? "Workflow page" : "Generated page"}
+            </div>
           </div>
-        )}
+
+          {/* Render generated HTML */}
+          {shape.uiSpecData ? (
+            <div
+              ref={viewportRef}
+              className="generated-ui-viewport relative flex-1 overflow-auto bg-white dark:bg-black/20"
+              style={{ pointerEvents: "auto" }}
+            >
+              <div
+                className="relative"
+                style={{
+                  width: Math.max(1, contentSize.width * contentScale),
+                  height: Math.max(1, contentSize.height * contentScale),
+                }}
+              >
+                <div
+                  ref={contentRef}
+                  className="origin-top-left"
+                  style={{
+                    transform: `scale(${contentScale})`,
+                  }}
+                  dangerouslySetInnerHTML={{ __html: safeHtml }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-neutral-600 dark:text-white/60 p-4 animate-pulse">
+              Generating…
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Label */}

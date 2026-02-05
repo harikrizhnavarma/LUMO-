@@ -258,6 +258,7 @@ export const useInfiniteCanvas = () => {
     // Iterate in rever // se order to check top shapes first
     for (let i = shapeList.length - 1; i >= 0; i--) {
       const shape = shapeList[i]
+      if (shape.type === 'generatedui') continue
       if (isPointInShape(worldPoint, shape)) {
         return shape
       }

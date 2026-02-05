@@ -377,28 +377,13 @@ export const useStyleGuide = (
   }
 }
 
-export const useUpdateContainer = (shape: GeneratedUIShape) => {
+export const useUpdateContainer = (
+  shape: GeneratedUIShape,
+  options?: { syncHeight?: boolean }
+) => {
   const dispatch = useAppDispatch()
   const containerRef = useRef<HTMLDivElement>(null)
-
-  //to ensure the shape height is updated when the content changes
-  useEffect(() => {
-    if (containerRef.current && shape.uiSpecData) {
-      const timeoutId = setTimeout(() => {
-        const actualHeight = containerRef.current?.offsetHeight || 0
-        if (actualHeight > 0 && Math.abs(actualHeight - shape.h) > 10) {
-          dispatch(
-            updateShape({
-              id: shape.id,
-              patch: { h: actualHeight },
-            })
-          )
-        }
-      }, 100)
-
-      return () => clearTimeout(timeoutId)
-    }
-  }, [shape.uiSpecData, shape.id, shape.h, dispatch])
+  const syncHeight = options?.syncHeight ?? true
 
   // Enhanced HTML sanitization function for basic safety
     // Strong HTML sanitization for generated UI content
@@ -427,11 +412,11 @@ export const useUpdateContainer = (shape: GeneratedUIShape) => {
     return sanitized;
   };
 
-    const lastHeightRef = useRef<number>(shape.h);
+  const lastHeightRef = useRef<number>(shape.h);
 
   // Ensure the shape height updates when content changes, without causing loops
   useEffect(() => {
-    if (!containerRef.current || !shape.uiSpecData) return;
+    if (!syncHeight || !containerRef.current || !shape.uiSpecData) return;
 
     const frame = requestAnimationFrame(() => {
       const actualHeight = containerRef.current?.offsetHeight ?? 0;
@@ -450,7 +435,11 @@ export const useUpdateContainer = (shape: GeneratedUIShape) => {
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [shape.uiSpecData, shape.id, dispatch]);
+  }, [shape.uiSpecData, shape.id, dispatch, syncHeight]);
+
+  useEffect(() => {
+    lastHeightRef.current = shape.h;
+  }, [shape.h]);
 
 
 

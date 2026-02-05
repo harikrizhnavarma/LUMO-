@@ -97,18 +97,6 @@ const schema = defineSchema({
     .index("by_brandKitId", ["brandKitId"])
     .index("by_userId", ["userId"]),
 
-  // Beta access one-time passcodes
-  beta_otps: defineTable({
-    email: v.string(),
-    codeHash: v.string(),
-    expiresAt: v.number(),
-    createdAt: v.number(),
-    attempts: v.number(),
-    maxAttempts: v.number(),
-    used: v.boolean(),
-    usedAt: v.optional(v.number()),
-  }).index("by_email", ["email"]),
-
   // Aggregated analytics snapshots for Brand Intelligence Dashboard
   brand_analytics_snapshots: defineTable({
     userId: v.id("users"),

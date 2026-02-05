@@ -1,7 +1,7 @@
 import React from "react";
 import { ProjectProvider } from "@/components/projects/provider";
 import { ProjectQuery } from "@/convex/query.config";
-import { InfiniteCanvas } from "@/components/canvas";
+import { CanvasWorkspace } from "@/components/canvas/workspace";
 import { BrandInfluenceControl } from "@/components/brand/brand-influence-control";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +49,7 @@ const CanvasPage = async ({ searchParams }: CanvasPageProps) => {
         </div>
 
         <div className="flex-1 min-h-0">
-          <InfiniteCanvas />
+          <CanvasWorkspace />
         </div>
       </div>
     </ProjectProvider>

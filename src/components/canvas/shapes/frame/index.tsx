@@ -41,15 +41,15 @@ export const Frame = ({
         "
         style={{
           left: shape.x + 12,
-          top: shape.y - 40,
+          top: shape.y - 34,
           zIndex: 80,
         }}
       >
         {/* Frame label pill */}
         <span
           className="
-            text-xs font-medium 
-            px-3 py-1 rounded-full 
+            text-[11px] font-medium 
+            px-2.5 py-0.5 rounded-full 
             bg-neutral-900 text-white 
             dark:bg-white dark:text-black 
             border border-neutral-200 dark:border-white/30 
@@ -60,7 +60,7 @@ export const Frame = ({
         </span>
 
         {/* Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {/* Inspiration */}
           <Button
             type="button"
@@ -68,7 +68,7 @@ export const Frame = ({
             variant="secondary"
             onClick={toggleInspiration}
             className="
-              h-8 rounded-full px-3 text-xs 
+              h-7 rounded-full px-2.5 text-[11px] 
               flex items-center gap-1
               bg-neutral-200/90 dark:bg-white/10 
               text-neutral-800 dark:text-white 
@@ -87,7 +87,7 @@ export const Frame = ({
             onClick={handleGenerateDesign}
             disabled={isGenerating}
             className="
-              h-8 rounded-full px-3 text-xs 
+              h-7 rounded-full px-2.5 text-[11px] 
               flex items-center gap-1
               bg-neutral-900 text-white 
               hover:bg-neutral-800

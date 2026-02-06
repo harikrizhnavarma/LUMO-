@@ -208,9 +208,6 @@ export const Navbar = () => {
             title={previewOpen ? "Hide preview" : "Show preview"}
           >
             <LayoutTemplate className="size-5" />
-            <span className="ml-2 text-sm hidden lg:inline">
-              {previewOpen ? "Hide preview" : "Show preview"}
-            </span>
           </Button>
         )}
 
@@ -235,11 +232,9 @@ export const Navbar = () => {
             title={toolbarVisible ? "Hide tools" : "Show tools"}
           >
             <Wrench className="size-5" />
-            <span className="ml-2 text-sm hidden lg:inline">
-              {toolbarVisible ? "Hide tools" : "Show tools"}
-            </span>
           </Button>
         )}
+        {hasCanvas && <Autosave />}
         <SignOutButton />
 
         <Button
@@ -266,8 +261,6 @@ export const Navbar = () => {
             <User className="size-5 text-neutral-700 dark:text-white" />
           </AvatarFallback>
         </Avatar>
-
-        {hasCanvas && <Autosave />}
 
         {/* Upgrade button – only on dashboard */}
         {!hasCanvas && !hasStyleGuide && (

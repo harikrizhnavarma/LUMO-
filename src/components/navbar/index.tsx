@@ -161,14 +161,14 @@ export const Navbar = () => {
             )}`) ?? undefined;
 
   const wrapperClass =
-    "grid p-6 fixed top-0 left-0 right-0 z-50 " +
+    "grid p-3 sm:p-4 lg:p-6 fixed top-0 left-0 right-0 z-50 " +
     "bg-transparent border-b border-transparent shadow-none pointer-events-none " +
     (showTabs ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2 lg:grid-cols-2");
 
   return (
     <div className={wrapperClass}>
       {/* Left: logo + project name */}
-      <div className="flex items-center gap-4 pointer-events-auto">
+      <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 pointer-events-auto">
         <Link
           href={`/dashboard/${me.name}`}
           className="logo"
@@ -179,11 +179,14 @@ export const Navbar = () => {
         </Link>
 
         {showProjectContext && project && (
-          <div
-            className="inline-flex max-w-[40vw] truncate rounded-full backdrop-blur-xl bg-[var(--canvas-panel-strong)] px-4 py-2 text-sm text-[var(--canvas-panel-text)] saturate-150 border border-[var(--canvas-panel-border)]"
-          >
-            Project / {project.name}
-          </div>
+          <>
+            <div
+              className="inline-flex max-w-[45vw] truncate rounded-full backdrop-blur-xl bg-[var(--canvas-panel-strong)] px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-sm text-[var(--canvas-panel-text)] saturate-150 border border-[var(--canvas-panel-border)]"
+            >
+              Project / {project.name}
+            </div>
+            {hasCanvas && <Autosave />}
+          </>
         )}
       </div>
 
@@ -242,12 +245,12 @@ export const Navbar = () => {
       )}
 
       {/* Right: actions */}
-      <div className="flex items-center gap-4 justify-end pointer-events-auto">
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 justify-end pointer-events-auto">
         {hasCanvas && <BrandInfluenceControl />}
         {hasCanvas && (
           <Button
             variant="secondary"
-            className="rounded-md h-12 px-4 flex items-center justify-center 
+            className="rounded-md h-9 w-9 sm:h-10 sm:w-10 lg:h-12 lg:w-12 px-0 flex items-center justify-center 
             border border-[var(--canvas-panel-border)] 
             bg-[var(--canvas-panel)]
             text-[var(--canvas-panel-text)]
@@ -264,14 +267,14 @@ export const Navbar = () => {
             }}
             title={previewOpen ? "Hide preview" : "Show preview"}
           >
-            <LayoutTemplate className="size-5" />
+            <LayoutTemplate className="size-4 sm:size-5" />
           </Button>
         )}
 
         {hasCanvas && (
           <Button
             variant="secondary"
-            className="rounded-md h-12 px-4 flex items-center justify-center 
+            className="rounded-md h-9 w-9 sm:h-10 sm:w-10 lg:h-12 lg:w-12 px-0 flex items-center justify-center 
             border border-[var(--canvas-panel-border)] 
             bg-[var(--canvas-panel)]
             text-[var(--canvas-panel-text)]
@@ -288,27 +291,26 @@ export const Navbar = () => {
             }}
             title={toolbarVisible ? "Hide tools" : "Show tools"}
           >
-            <Wrench className="size-5" />
+            <Wrench className="size-4 sm:size-5" />
           </Button>
         )}
-        {hasCanvas && <Autosave />}
         <SignOutButton />
 
         <Button
           variant="secondary"
-          className="rounded-md h-12 w-12 flex items-center justify-center 
+          className="rounded-md h-9 w-9 sm:h-10 sm:w-10 lg:h-12 lg:w-12 flex items-center justify-center 
           border border-[var(--canvas-panel-border)] 
           bg-[var(--canvas-panel)]
           text-[var(--canvas-panel-text)]
           hover:bg-[var(--canvas-panel-hover-strong)] transition"
         >
-          <CircleQuestionMark className="size-5 text-[var(--canvas-panel-text)]" />
+          <CircleQuestionMark className="size-4 sm:size-5 text-[var(--canvas-panel-text)]" />
         </Button>
 
         <ThemeToggle />
 
         {/* 🔥 Avatar: always visible with fallback */}
-        <Avatar className="size-12 ml-2 border border-[var(--canvas-panel-border)] overflow-hidden">
+        <Avatar className="size-9 sm:size-10 lg:size-12 ml-1 sm:ml-2 border border-[var(--canvas-panel-border)] overflow-hidden">
           <AvatarImage
             src={avatarSrc || undefined}
             alt={me?.name ?? "Profile picture"}

@@ -61,6 +61,7 @@
     "convex": "^1.25.4",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "gsap": "^3.12.5",
     "html-react-parser": "^5.2.6",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",

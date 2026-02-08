@@ -10,7 +10,7 @@ import { ProfileCard } from "./profile-card";
 import { GridIcon, LibraryIcon, CodeBoxIcon, SparklesIcon } from "./icons";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { toast } from "sonner";
 
@@ -72,6 +72,7 @@ const defaultProfile = (profile: LumoUserProfile | null): LocalProfile => {
 export const LumoDashboard = ({ projects, profile }: LumoDashboardProps) => {
   const router = useRouter();
   const { handleSignOut } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const dispatch = useAppDispatch();
   const { createProject, isCreating, projects: localProjects } =
     useProjectCreation();
@@ -137,6 +138,20 @@ export const LumoDashboard = ({ projects, profile }: LumoDashboardProps) => {
     [activeProjects, visibleCount]
   );
   const canShowMore = visibleProjects.length < activeProjects.length;
+
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated && studioProfile === null) {
+      router.replace("/onboarding");
+    }
+  }, [isAuthLoading, isAuthenticated, studioProfile, router]);
+
+  if (
+    isAuthLoading ||
+    studioProfile === undefined ||
+    (!isAuthLoading && isAuthenticated && studioProfile === null)
+  ) {
+    return null;
+  }
 
   useEffect(() => {
     if (studioProfile) {

@@ -145,14 +145,6 @@ export const LumoDashboard = ({ projects, profile }: LumoDashboardProps) => {
     }
   }, [isAuthLoading, isAuthenticated, studioProfile, router]);
 
-  if (
-    isAuthLoading ||
-    studioProfile === undefined ||
-    (!isAuthLoading && isAuthenticated && studioProfile === null)
-  ) {
-    return null;
-  }
-
   useEffect(() => {
     if (studioProfile) {
       setLocalProfile((prev) => ({
@@ -194,6 +186,11 @@ export const LumoDashboard = ({ projects, profile }: LumoDashboardProps) => {
       setVisibleCount(3);
     }
   }, [activeTab]);
+
+  const shouldBlockRender =
+    isAuthLoading ||
+    studioProfile === undefined ||
+    (!isAuthLoading && isAuthenticated && studioProfile === null);
 
   const handleCreateProject = async () => {
     const trimmedName = projectName.trim();
@@ -290,6 +287,10 @@ export const LumoDashboard = ({ projects, profile }: LumoDashboardProps) => {
       toast.error("Failed to save profile");
     }
   };
+
+  if (shouldBlockRender) {
+    return null;
+  }
 
   return (
     <div className="pd-prism-shell fade-in">

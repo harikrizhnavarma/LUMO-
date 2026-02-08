@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { useState, useEffect, RefObject, useRef } from 'react'
+import { useState, useEffect, RefObject, useRef, useCallback } from 'react'
 import { useMutation } from 'convex/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -25,30 +24,18 @@ export interface MoodBoardImage {
   isFromServer?: boolean // Track if image came from server
 }
 
-interface StylesFormData {
-  images: MoodBoardImage[]
-}
-
 export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
   const [dragActive, setDragActive] = useState(false)
   const searchParams = useSearchParams()
   const projectId = searchParams.get('project')
-
-  const form = useForm<StylesFormData>({
-    defaultValues: {
-      images: [],
-    },
-  })
-
-  const { watch, setValue, getValues } = form
-  const images = watch('images')
+  const [images, setImages] = useState<MoodBoardImage[]>([])
 
   const generateUploadUrl = useMutation(api.moodboard.generateUploadUrl)
   const addMoodBoardImage = useMutation(api.moodboard.addMoodBoardImage)
   const removeMoodBoardImage = useMutation(api.moodboard.removeMoodBoardImage)
 
   // Upload image to Convex storage and return both storageId and URL
-  const uploadImage = async (
+  const uploadImage = useCallback(async (
     file: File
   ): Promise<{ storageId: string; url?: string }> => {
     try {
@@ -80,7 +67,7 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
     } catch (error) {
       throw error
     }
-  }
+  }, [addMoodBoardImage, generateUploadUrl, projectId])
 
   // Load existing images from server and merge with client images
   useEffect(() => {
@@ -95,12 +82,12 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
         isFromServer: true,
       }))
 
-      const currentImages = getValues('images')
+      setImages((currentImages) => {
+        // If we have no images, load server images
+        if (currentImages.length === 0) {
+          return serverImages
+        }
 
-      // If we have no images, load server images
-      if (currentImages.length === 0) {
-        setValue('images', serverImages)
-      } else {
         // Merge server images with client images, replacing uploaded ones
         const mergedImages = [...currentImages]
 
@@ -121,10 +108,58 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
           }
         })
 
-        setValue('images', mergedImages)
-      }
+        return mergedImages
+      })
     }
-  }, [guideImages, setValue, getValues])
+  }, [guideImages])
+
+  const startUpload = useCallback(
+    async (image: MoodBoardImage) => {
+      if (!image.file) {
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === image.id
+              ? { ...img, uploading: false, error: 'Missing file data' }
+              : img
+          )
+        )
+        return
+      }
+
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === image.id ? { ...img, uploading: true } : img
+        )
+      )
+
+      try {
+        const { storageId } = await uploadImage(image.file)
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === image.id
+              ? {
+                  ...img,
+                  storageId,
+                  uploaded: true,
+                  uploading: false,
+                  isFromServer: true,
+                }
+              : img
+          )
+        )
+      } catch (error) {
+        console.error(error)
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === image.id
+              ? { ...img, uploading: false, error: 'Upload failed' }
+              : img
+          )
+        )
+      }
+    },
+    [uploadImage]
+  )
 
   // Add image to the mood board with instant preview
   const addImage = (file: File) => {
@@ -143,9 +178,11 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
     }
 
     const updatedImages = [...images, newImage]
-    setValue('images', updatedImages)
+    setImages(updatedImages)
 
     toast.success('Image added to mood board')
+
+    void startUpload(newImage)
   }
 
   // Remove image from mood board
@@ -178,7 +215,7 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
       return true
     })
 
-    setValue('images', updatedImages)
+    setImages(updatedImages)
     toast.success('Image removed')
   }
 
@@ -225,68 +262,6 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
     e.target.value = ''
   }
 
-  // Background upload effect - uploads images to Convex as soon as they're added
-  useEffect(() => {
-    const uploadPendingImages = async () => {
-      const currentImages = getValues('images')
-
-      for (let i = 0; i < currentImages.length; i++) {
-        const image = currentImages[i]
-
-        if (!image.uploaded && !image.uploading && !image.error) {
-          // Mark as uploading
-          const updatedImages = [...currentImages]
-          updatedImages[i] = { ...image, uploading: true }
-          setValue('images', updatedImages)
-
-          try {
-            const { storageId } = await uploadImage(image.file!)
-
-            // Mark as uploaded - the image will be refreshed from server via query
-            const finalImages = getValues('images')
-            const finalIndex = finalImages.findIndex(
-              (img) => img.id === image.id
-            )
-
-            if (finalIndex !== -1) {
-              finalImages[finalIndex] = {
-                ...finalImages[finalIndex],
-                storageId,
-                uploaded: true,
-                uploading: false,
-                isFromServer: true, // Now it's a server image
-              }
-              setValue('images', [...finalImages])
-
-              // The query will automatically refresh and provide the Convex URL
-              // We'll let the server images take precedence on next render
-            }
-          } catch (error) {
-            console.error(error)
-            // Mark as error
-            const errorImages = getValues('images')
-            const errorIndex = errorImages.findIndex(
-              (img) => img.id === image.id
-            )
-
-            if (errorIndex !== -1) {
-              errorImages[errorIndex] = {
-                ...errorImages[errorIndex],
-                uploading: false,
-                error: 'Upload failed',
-              }
-              setValue('images', [...errorImages])
-            }
-          }
-        }
-      }
-    }
-
-    if (images.length > 0) {
-      uploadPendingImages()
-    }
-  }, [images, setValue, getValues, uploadImage])
-
   // Cleanup preview URLs on unmount
   useEffect(() => {
     return () => {
@@ -297,7 +272,6 @@ export const useMoodBoard = (guideImages: MoodBoardImage[]) => {
   }, [])
 
   return {
-    form,
     images,
     dragActive,
     addImage,

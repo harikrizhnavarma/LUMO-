@@ -10,16 +10,86 @@ export const Text = ({ shape }: { shape: TextShape }) => {
   const [tempText, setTempText] = useState(shape.text);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 🔑 THEME-AWARE TEXT COLOR
-  // If fill is empty or pure white, fall back to var(--canvas-stroke)
-  const effectiveColor =
-    !shape.fill ||
-    shape.fill === "#ffffff" ||
-    shape.fill === "#fff" ||
-    shape.fill.toLowerCase?.() === "white"
-      ? "var(--canvas-stroke)"
-      : shape.fill;
+  const parseColor = (value: string) => {
+    const trimmed = value.trim();
+    if (trimmed.startsWith("#")) {
+      const hex = trimmed.replace("#", "");
+      const normalized =
+        hex.length === 3
+          ? hex
+              .split("")
+              .map((ch) => `${ch}${ch}`)
+              .join("")
+          : hex;
+      if (normalized.length !== 6) return null;
+      const r = parseInt(normalized.slice(0, 2), 16);
+      const g = parseInt(normalized.slice(2, 4), 16);
+      const b = parseInt(normalized.slice(4, 6), 16);
+      return { r, g, b };
+    }
+    const rgbMatch = trimmed.match(
+      /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/
+    );
+    if (!rgbMatch) return null;
+    return {
+      r: Number(rgbMatch[1]),
+      g: Number(rgbMatch[2]),
+      b: Number(rgbMatch[3]),
+    };
+  };
 
+  const luminance = (rgb: { r: number; g: number; b: number }) => {
+    const transform = (c: number) => {
+      const srgb = c / 255;
+      return srgb <= 0.03928
+        ? srgb / 12.92
+        : Math.pow((srgb + 0.055) / 1.055, 2.4);
+    };
+    const r = transform(rgb.r);
+    const g = transform(rgb.g);
+    const b = transform(rgb.b);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+
+  const getCanvasBackground = () => {
+    if (typeof window === "undefined") return null;
+    const value = getComputedStyle(document.documentElement)
+      .getPropertyValue("--canvas-bg")
+      .trim();
+    return value || null;
+  };
+
+  // dY"` THEME-AWARE TEXT COLOR
+  // If fill is empty or near-colliding with the canvas background, fall back to theme text.
+  const rawFill = shape.fill?.toString().trim() ?? "";
+  const lowerFill = rawFill.toLowerCase();
+  const defaultColor = "var(--canvas-panel-text)";
+  let effectiveColor = rawFill || defaultColor;
+
+  if (!rawFill || lowerFill === "transparent") {
+    effectiveColor = defaultColor;
+  } else if (
+    lowerFill === "#ffffff" ||
+    lowerFill === "#fff" ||
+    lowerFill === "white" ||
+    lowerFill === "#000000" ||
+    lowerFill === "#000" ||
+    lowerFill === "black"
+  ) {
+    effectiveColor = defaultColor;
+  } else {
+    const fillRgb = parseColor(rawFill);
+    const bgValue = getCanvasBackground();
+    const bgRgb = bgValue ? parseColor(bgValue) : null;
+    if (fillRgb && bgRgb) {
+      const ratio =
+        (Math.max(luminance(fillRgb), luminance(bgRgb)) + 0.05) /
+        (Math.min(luminance(fillRgb), luminance(bgRgb)) + 0.05);
+      if (ratio < 2.6) {
+        effectiveColor = defaultColor;
+      }
+    }
+  }
   // Auto-focus when text is newly created (placeholder text)
   useEffect(() => {
     if (shape.text === "Text" && inputRef.current) {

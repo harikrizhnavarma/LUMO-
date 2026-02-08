@@ -3,11 +3,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface ProjectSummary {
   _id: string;
   name: string;
+  description?: string;
   projectNumber: number;
   thumbnail?: string;
   lastModified: number;
   createdAt: number;
   isPublic?: boolean;
+  isArchived?: boolean;
 }
 
 interface ProjectsState {

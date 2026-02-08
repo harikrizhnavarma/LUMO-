@@ -47,9 +47,9 @@ export const ZoomBar = () => {
         className="
         flex items-center gap-1 
         backdrop-blur-xl 
-        bg-neutral-200/70 dark:bg-white/10 
-        border border-neutral-300 dark:border-white/20 
-        rounded-full p-3 
+        bg-[var(--canvas-panel)] 
+        border border-[var(--canvas-panel-border)] 
+        rounded-md p-3 
         transition
       "
       >
@@ -59,14 +59,14 @@ export const ZoomBar = () => {
           size="lg"
           onClick={handleZoomOut}
           className="
-            w-9 h-9 p-0 rounded-full cursor-pointer 
-            hover:bg-neutral-300 dark:hover:bg-white/20
-            border border-transparent hover:border-neutral-400 dark:hover:border-white/30
+            w-9 h-9 p-0 rounded-md cursor-pointer 
+            hover:bg-[var(--canvas-panel-hover-strong)]
+            border border-transparent hover:border-[var(--canvas-panel-border)]
             transition
           "
           title="Zoom Out"
         >
-          <ZoomOut className="w-4 h-4 text-neutral-700 dark:text-white" />
+          <ZoomOut className="w-4 h-4 text-[var(--canvas-panel-text)]" />
         </Button>
 
         {/* Percentage Input */}
@@ -75,10 +75,10 @@ export const ZoomBar = () => {
             type="text"
             className="
               w-14 text-center bg-transparent text-sm font-mono 
-              text-neutral-800 dark:text-white
+              text-[var(--canvas-panel-text)]
               rounded-md outline-none 
-              border border-neutral-400 dark:border-white/20 
-              hover:border-neutral-600 dark:hover:border-white/40 
+              border border-[var(--canvas-panel-border)] 
+              hover:border-[var(--canvas-panel-hover-strong)] 
               transition
             "
             value={zoomInput}
@@ -90,7 +90,7 @@ export const ZoomBar = () => {
             onBlur={applyZoom}
             onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
           />
-          <span className="text-sm font-mono text-neutral-700 dark:text-white ml-1">
+          <span className="text-sm font-mono text-[var(--canvas-panel-text)] ml-1">
             %
           </span>
         </div>
@@ -101,14 +101,14 @@ export const ZoomBar = () => {
           size="lg"
           onClick={handleZoomIn}
           className="
-            w-9 h-9 p-0 rounded-full cursor-pointer 
-            hover:bg-neutral-300 dark:hover:bg-white/20
-            border border-transparent hover:border-neutral-400 dark:hover:border-white/30
+            w-9 h-9 p-0 rounded-md cursor-pointer 
+            hover:bg-[var(--canvas-panel-hover-strong)]
+            border border-transparent hover:border-[var(--canvas-panel-border)]
             transition
           "
           title="Zoom In"
         >
-          <ZoomIn className="w-4 h-4 text-neutral-700 dark:text-white" />
+          <ZoomIn className="w-4 h-4 text-[var(--canvas-panel-text)]" />
         </Button>
       </div>
     </div>

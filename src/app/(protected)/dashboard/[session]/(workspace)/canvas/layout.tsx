@@ -45,7 +45,7 @@ const Layout = ({ children }: Props) => {
   return (
     <div className="w-full h-screen">
       {children}
-      {isToolbarVisible && <Toolbar />}
+      <Toolbar isVisible={isToolbarVisible} />
     </div>
   );
 };

@@ -155,6 +155,7 @@ const schema = defineSchema({
     lastModified: v.number(),
     createdAt: v.number(),
     isPublic: v.optional(v.boolean()),
+    isArchived: v.optional(v.boolean()),
     tags: v.optional(v.array(v.string())),
     projectNumber: v.number(),
   })
@@ -167,6 +168,20 @@ const schema = defineSchema({
   project_counters: defineTable({
     userId: v.id("users"),
     nextProjectNumber: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  studio_profiles: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    handle: v.string(),
+    title: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    privacy: v.optional(v.string()),
+    syncMode: v.optional(v.string()),
+    color: v.optional(v.string()),
+    customHex: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }).index("by_userId", ["userId"]),
 });
 

@@ -64,7 +64,7 @@ export const useAuth = () => {
     }
   };
 
-  const handleSignUp = async (data: SignUpData) => {
+  const handleSignUp = async (data: SignUpData, redirectTo = "/dashboard") => {
     setIsLoading(true);
     try {
       await signIn("password", {
@@ -73,7 +73,7 @@ export const useAuth = () => {
         name: `${data.firstName} ${data.lastName}`,
         flow: "signUp",
       });
-      router.push("/dashboard");
+      router.push(redirectTo);
     } catch (error) {
       console.error("Sign up error:", error);
       signUpForm.setError("root", {
@@ -84,10 +84,10 @@ export const useAuth = () => {
     }
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (redirectTo = "/auth/sign-in") => {
     try {
       await signOut();
-      router.push("/auth/sign-in");
+      router.push(redirectTo);
     } catch (error) {
       console.error("Sign out error:", error);
     }

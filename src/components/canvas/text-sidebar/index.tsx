@@ -77,11 +77,11 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
     className={cn(
       "fixed right-5 top-1/2 -translate-y-1/2 w-80 " +
       "backdrop-blur-xl " +
-      "bg-white/80 dark:bg-white/[0.06] " +
-      "border border-neutral-200 dark:border-white/15 " +
+      "bg-[var(--canvas-panel-strong)] " +
+      "border border-[var(--canvas-panel-border)] " +
       "shadow-md dark:shadow-none " +
       "rounded-xl p-3 gap-2 " +
-      "text-neutral-900 dark:text-white " +
+      "text-[var(--canvas-panel-text)] " +
       "saturate-150 " +
       "z-[70] " + // ⬅️ higher than bottom bar z-50
       "transition-transform duration-300",
@@ -91,7 +91,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
     <div className="p-4 flex flex-col gap-10 overflow-y-auto max-h-[calc(100vh-8rem)]">
       {/* Font family */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Font Family
         </Label>
         <Select
@@ -102,9 +102,9 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
             className="
               z-[80]
               w-full
-              bg-white dark:bg-white/5
-              border border-neutral-300 dark:border-white/15
-              text-neutral-900 dark:text-white
+              bg-[var(--canvas-panel-strong)]
+              border border-[var(--canvas-panel-border)]
+              text-[var(--canvas-panel-text)]
               rounded-lg
             "
           >
@@ -113,9 +113,9 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
           <SelectContent
             className="
               z-[80]
-              bg-white dark:bg-neutral-950
-              border border-neutral-200 dark:border-white/15
-              text-neutral-900 dark:text-white
+              bg-[var(--canvas-panel-strong)]
+              border border-[var(--canvas-panel-border)]
+              text-[var(--canvas-panel-text)]
             "
           >
             {fontFamilies.map((font) => (
@@ -123,8 +123,8 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
                 key={font}
                 value={font}
                 className="
-                  text-neutral-900 dark:text-white
-                  hover:bg-neutral-100 dark:hover:bg-white/10
+                  text-[var(--canvas-panel-text)]
+                  hover:bg-[var(--canvas-panel-hover)]
                 "
               >
                 <span style={{ fontFamily: font }}>{font.split(',')[0]}</span>
@@ -137,7 +137,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Font size */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Font Size: {selectedTextShape.fontSize}px
         </Label>
         <Slider
@@ -152,7 +152,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Font weight */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Font Weight: {selectedTextShape.fontWeight}
         </Label>
         <Slider
@@ -167,7 +167,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Style toggles */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Style
         </Label>
         <div className="flex gap-2">
@@ -177,11 +177,11 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
               updateTextProperty("fontWeight", pressed ? 700 : 400)
             }
             className="
-              border border-neutral-300 dark:border-white/20
-              bg-white dark:bg-white/5
-              text-neutral-700 dark:text-white
-              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
-              data-[state=on]:text-white dark:data-[state=on]:text-black
+              border border-[var(--canvas-panel-border)]
+              bg-[var(--canvas-panel-strong)]
+              text-[var(--canvas-panel-text)]
+              data-[state=on]:bg-[var(--canvas-panel-text)]
+              data-[state=on]:text-[var(--canvas-bg)]
             "
           >
             <Bold className="w-4 h-4" />
@@ -193,11 +193,11 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
               updateTextProperty("fontStyle", pressed ? "italic" : "normal")
             }
             className="
-              border border-neutral-300 dark:border-white/20
-              bg-white dark:bg-white/5
-              text-neutral-700 dark:text-white
-              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
-              data-[state=on]:text-white dark:data-[state=on]:text-black
+              border border-[var(--canvas-panel-border)]
+              bg-[var(--canvas-panel-strong)]
+              text-[var(--canvas-panel-text)]
+              data-[state=on]:bg-[var(--canvas-panel-text)]
+              data-[state=on]:text-[var(--canvas-bg)]
             "
           >
             <Italic className="w-4 h-4" />
@@ -212,11 +212,11 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
               )
             }
             className="
-              border border-neutral-300 dark:border-white/20
-              bg-white dark:bg-white/5
-              text-neutral-700 dark:text-white
-              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
-              data-[state=on]:text-white dark:data-[state=on]:text-black
+              border border-[var(--canvas-panel-border)]
+              bg-[var(--canvas-panel-strong)]
+              text-[var(--canvas-panel-text)]
+              data-[state=on]:bg-[var(--canvas-panel-text)]
+              data-[state=on]:text-[var(--canvas-bg)]
             "
           >
             <Underline className="w-4 h-4" />
@@ -231,11 +231,11 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
               )
             }
             className="
-              border border-neutral-300 dark:border-white/20
-              bg-white dark:bg-white/5
-              text-neutral-700 dark:text-white
-              data-[state=on]:bg-neutral-900 dark:data-[state=on]:bg-white
-              data-[state=on]:text-white dark:data-[state=on]:text-black
+              border border-[var(--canvas-panel-border)]
+              bg-[var(--canvas-panel-strong)]
+              text-[var(--canvas-panel-text)]
+              data-[state=on]:bg-[var(--canvas-panel-text)]
+              data-[state=on]:text-[var(--canvas-bg)]
             "
           >
             <Strikethrough className="w-4 h-4" />
@@ -245,7 +245,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Line height */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Line Height: {selectedTextShape.lineHeight}
         </Label>
         <Slider
@@ -260,7 +260,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Letter spacing */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)]">
           Letter Spacing: {selectedTextShape.letterSpacing}px
         </Label>
         <Slider
@@ -277,7 +277,7 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
 
       {/* Text color */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-neutral-700 dark:text-white/80 flex items-center gap-2">
+        <Label className="text-sm font-medium text-[var(--canvas-panel-muted)] flex items-center gap-2">
           <Palette className="w-4 h-4" />
           Text Color
         </Label>
@@ -288,16 +288,16 @@ export const TextSidebar = ({ isOpen }: TextSidebarProps) => {
             placeholder="#111111"
             className="
               flex-1
-              bg-white dark:bg-white/5
-              border border-neutral-300 dark:border-white/15
-              text-neutral-900 dark:text-white
-              placeholder:text-neutral-400 dark:placeholder:text-white/50
+              bg-[var(--canvas-panel-strong)]
+              border border-[var(--canvas-panel-border)]
+              text-[var(--canvas-panel-text)]
+              placeholder:text-[var(--canvas-panel-muted)]
             "
           />
           <div
             className="
               w-10 h-10 rounded
-              border border-neutral-300 dark:border-white/30
+              border border-[var(--canvas-panel-border)]
               cursor-pointer
             "
             style={{ backgroundColor: selectedTextShape.fill || "#111111" }}

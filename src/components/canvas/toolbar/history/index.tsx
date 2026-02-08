@@ -21,11 +21,11 @@ export const HistoryPill = () => {
       <div
         className="
         inline-flex items-center 
-        rounded-full p-2
+        rounded-md p-2
         backdrop-blur-xl
-        bg-neutral-200/70 dark:bg-white/10
-        border border-neutral-300 dark:border-white/20
-        text-neutral-700 dark:text-white
+        bg-[var(--canvas-panel)]
+        border border-[var(--canvas-panel-border)]
+        text-[var(--canvas-panel-text)]
         transition
       "
       >
@@ -36,8 +36,8 @@ export const HistoryPill = () => {
           disabled={!canUndo}
           className="
             inline-grid h-9 w-9 place-items-center
-            rounded-full 
-            hover:bg-neutral-300 dark:hover:bg-white/20
+            rounded-md 
+            hover:bg-[var(--canvas-panel-hover-strong)]
             transition-all cursor-pointer
             disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-default
           "
@@ -45,12 +45,12 @@ export const HistoryPill = () => {
         >
           <Undo2
             size={18}
-            className="stroke-[1.75] text-neutral-700 dark:text-white"
+            className="stroke-[1.75] text-[var(--canvas-panel-text)]"
           />
         </button>
 
         {/* Separator */}
-        <span className="mx-1 h-5 w-px rounded bg-neutral-400 dark:bg-white/20" />
+        <span className="mx-1 h-5 w-px rounded bg-[var(--canvas-panel-border)]" />
 
         {/* Redo */}
         <button
@@ -59,8 +59,8 @@ export const HistoryPill = () => {
           disabled={!canRedo}
           className="
             inline-grid h-9 w-9 place-items-center
-            rounded-full 
-            hover:bg-neutral-300 dark:hover:bg-white/20
+            rounded-md 
+            hover:bg-[var(--canvas-panel-hover-strong)]
             transition-all cursor-pointer
             disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-default
           "
@@ -68,7 +68,7 @@ export const HistoryPill = () => {
         >
           <Redo2
             size={18}
-            className="stroke-[1.75] text-neutral-700 dark:text-white"
+            className="stroke-[1.75] text-[var(--canvas-panel-text)]"
           />
         </button>
       </div>

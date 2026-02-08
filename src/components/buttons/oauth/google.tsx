@@ -9,7 +9,7 @@ export const GoogleOAuthButton = () => {
       onClick={() => void signIn("google")}
       type="button"
       variant="outline"
-      className="h-10 w-full justify-center gap-2 rounded-full border border-white/40 bg-white text-neutral-800 hover:bg-white/90 hover:text-neutral-900">
+      className="h-10 w-full justify-center gap-2 rounded-full border border-neutral-300/70 bg-white text-neutral-900 hover:bg-neutral-100 hover:text-neutral-900 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 cursor-pointer">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="0.98em"

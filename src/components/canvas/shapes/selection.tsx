@@ -121,7 +121,10 @@ export const SelectionOverlay = ({
 
   return (
     <div
-      className="absolute pointer-events-none border-2 border-blue-500 bg-blue-500/10"
+      className={[
+        "absolute pointer-events-none border-2 border-blue-500",
+        shape.type === "frame" ? "bg-transparent" : "bg-blue-500/10",
+      ].join(" ")}
       style={{
         left: bounds.x - 2,
         top: bounds.y - 2,

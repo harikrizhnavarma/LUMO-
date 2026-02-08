@@ -16,8 +16,10 @@ export const CanvasWorkspace = () => {
   } = useGlobalChat();
 
   return (
-    <div className="relative flex h-full w-full overflow-hidden">
-      <div className="relative flex-1 min-w-0">
+    <div className="relative flex h-full w-full overflow-hidden canvas-prism">
+      <div className="grid-master" />
+      <div className="float-blob pd-blob" />
+      <div className="relative z-10 flex-1 min-w-0">
         <InfiniteCanvas
           toggleChat={toggleChat}
           generateWorkflow={generateWorkflow}

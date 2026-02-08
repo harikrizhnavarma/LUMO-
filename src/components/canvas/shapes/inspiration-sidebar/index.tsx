@@ -227,12 +227,12 @@ export const InspirationSidebar = ({
         `
         fixed left-5 top-1/2 -translate-y-1/2 w-80 
         backdrop-blur-xl 
-        bg-white/85 dark:bg-neutral-900/80 
-        border border-neutral-300 dark:border-white/15 
+        bg-[var(--canvas-panel-strong)] 
+        border border-[var(--canvas-panel-border)] 
         rounded-lg z-50 
         transition-transform duration-300 
         shadow-lg dark:shadow-none
-        text-neutral-900 dark:text-white
+        text-[var(--canvas-panel-text)]
         `
       )}
     >
@@ -240,8 +240,8 @@ export const InspirationSidebar = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-neutral-700 dark:text-white/80" />
-            <Label className="text-sm font-medium text-neutral-900 dark:text-white/80">
+            <ImageIcon className="w-5 h-5 text-[var(--canvas-panel-text)]" />
+            <Label className="text-sm font-medium text-[var(--canvas-panel-text)]">
               Inspiration Board
             </Label>
           </div>
@@ -251,9 +251,9 @@ export const InspirationSidebar = ({
             onClick={onClose}
             className="
               h-8 w-8 p-0 
-              text-neutral-500 dark:text-white/60 
-              hover:text-neutral-900 dark:hover:text-white 
-              hover:bg-neutral-200/70 dark:hover:bg-white/10
+              text-[var(--canvas-panel-muted)] 
+              hover:text-[var(--canvas-panel-text)] 
+              hover:bg-[var(--canvas-panel-hover)]
             "
           >
             <X className="w-4 h-4" />
@@ -267,8 +267,8 @@ export const InspirationSidebar = ({
             dragActive
               ? "border-blue-500 bg-blue-500/10"
               : images.length < 6
-              ? "border-neutral-300 dark:border-white/20 hover:border-neutral-500 dark:hover:border-white/40 hover:bg-neutral-100/60 dark:hover:bg-white/5"
-              : "border-neutral-300/60 dark:border-white/20 bg-neutral-100/40 dark:bg-white/5 cursor-not-allowed opacity-60"
+              ? "border-[var(--canvas-panel-border)] hover:border-[var(--canvas-panel-hover-strong)] hover:bg-[var(--canvas-panel-hover)]"
+              : "border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-hover)] cursor-not-allowed opacity-60"
           )}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -286,16 +286,16 @@ export const InspirationSidebar = ({
           />
 
           <div className="flex flex-col items-center gap-2">
-            <Upload className="w-8 h-8 text-neutral-500 dark:text-white/40" />
-            <p className="text-sm text-neutral-700 dark:text-white/70 text-center">
+            <Upload className="w-8 h-8 text-[var(--canvas-panel-muted)]" />
+            <p className="text-sm text-[var(--canvas-panel-text)] text-center">
               {images.length < 6 ? (
                 <>
                   Drop images here or{" "}
-                  <span className="text-blue-600 dark:text-blue-400">
+                  <span className="text-[var(--canvas-accent)]">
                     browse
                   </span>
                   <br />
-                  <span className="text-xs text-neutral-500 dark:text-white/50">
+                  <span className="text-xs text-[var(--canvas-panel-muted)]">
                     {images.length}/6 images uploaded
                   </span>
                 </>
@@ -310,7 +310,7 @@ export const InspirationSidebar = ({
         {images.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-sm text-neutral-800 dark:text-white/80">
+              <Label className="text-sm text-[var(--canvas-panel-text)]">
                 Uploaded Images ({images.length})
               </Label>
               <Button
@@ -319,9 +319,9 @@ export const InspirationSidebar = ({
                 onClick={clearAllImages}
                 className="
                   h-7 px-2 text-xs 
-                  text-neutral-600 dark:text-white/70 
-                  hover:text-neutral-900 dark:hover:text-white 
-                  hover:bg-neutral-200/70 dark:hover:bg-white/10
+                  text-[var(--canvas-panel-muted)] 
+                  hover:text-[var(--canvas-panel-text)] 
+                  hover:bg-[var(--canvas-panel-hover)]
                 "
               >
                 <Trash2 className="w-3 h-3 mr-1" />
@@ -335,8 +335,8 @@ export const InspirationSidebar = ({
                   key={image.id}
                   className="
                     relative group aspect-square rounded-lg overflow-hidden 
-                    border border-neutral-300 dark:border-white/15 
-                    bg-neutral-100 dark:bg-white/5
+                    border border-[var(--canvas-panel-border)] 
+                    bg-[var(--canvas-panel-hover)]
                   "
                 >
                   <Image
@@ -381,20 +381,20 @@ export const InspirationSidebar = ({
                 </div>
               ))}
 
-              {images.length < 6 && (
+                  {images.length < 6 && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="
                     aspect-square rounded-lg border-2 border-dashed 
-                    border-neutral-300 dark:border-white/20 
-                    bg-neutral-100/60 dark:bg-white/5 
-                    hover:border-neutral-500 dark:hover:border-white/40 
-                    hover:bg-neutral-200/70 dark:hover:bg-white/10 
+                    border-[var(--canvas-panel-border)] 
+                    bg-[var(--canvas-panel-hover)] 
+                    hover:border-[var(--canvas-panel-hover-strong)] 
+                    hover:bg-[var(--canvas-panel-hover-strong)] 
                     transition-all duration-200 
                     flex items-center justify-center group
                   "
                 >
-                  <Plus className="w-6 h-6 text-neutral-500 dark:text-white/50 group-hover:text-neutral-700 dark:group-hover:text-white/80" />
+                  <Plus className="w-6 h-6 text-[var(--canvas-panel-muted)] group-hover:text-[var(--canvas-panel-text)]" />
                 </button>
               )}
             </div>

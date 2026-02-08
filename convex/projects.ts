@@ -8,10 +8,14 @@ export const createProject = mutation({
     userId: v.id("users"),
     brandId: v.optional(v.id("brands")), // Optional brand association
     name: v.optional(v.string()),
+    description: v.optional(v.string()),
     sketchesData: v.any(), // JSON structure from Redux shapes state
     thumbnail: v.optional(v.string()),
   },
-  handler: async (ctx, { userId, brandId, name, sketchesData, thumbnail }) => {
+  handler: async (
+    ctx,
+    { userId, brandId, name, description, sketchesData, thumbnail }
+  ) => {
     console.log("🚀 [Convex] Creating project for user:", userId);
 
     // Get next project number for auto-naming
@@ -23,12 +27,14 @@ export const createProject = mutation({
       userId,
       brandId,
       name: projectName,
+      description: description || undefined,
       sketchesData,
       thumbnail,
       projectNumber,
       lastModified: Date.now(),
       createdAt: Date.now(),
       isPublic: false,
+      isArchived: false,
     });
 
     console.log("✅ [Convex] Project created:", {
@@ -62,11 +68,13 @@ export const getUserProjects = query({
     return projects.map((project) => ({
       _id: project._id,
       name: project.name,
+      description: project.description,
       projectNumber: project.projectNumber,
       thumbnail: project.thumbnail,
       lastModified: project.lastModified,
       createdAt: project.createdAt,
       isPublic: project.isPublic,
+      isArchived: project.isArchived ?? false,
       brandId: project.brandId,
     }));
   },
@@ -205,6 +213,28 @@ export const deleteProject = mutation({
     await ctx.db.delete(projectId);
     console.log("🗑️ [Convex] Project deleted:", projectId);
 
+    return { success: true };
+  },
+});
+
+export const archiveProject = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const project = await ctx.db.get(projectId);
+    if (!project) throw new Error("Project not found");
+    if (project.userId !== userId) {
+      throw new Error("Access denied");
+    }
+
+    await ctx.db.patch(projectId, {
+      isArchived: true,
+      lastModified: Date.now(),
+    });
+
+    console.log("dY-` [Convex] Project archived:", projectId);
     return { success: true };
   },
 });

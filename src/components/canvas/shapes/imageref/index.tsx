@@ -71,13 +71,13 @@ export const ImageRef = ({ shape }: { shape: ImageRefShape }) => {
         className="
           relative h-full w-full overflow-hidden rounded-lg
           border border-dashed border-neutral-400/80 dark:border-white/25
-          bg-white/70 dark:bg-white/5 shadow-sm
+          bg-[var(--canvas-panel)] shadow-sm
         "
       >
         <div
           className="
             absolute left-3 top-3 px-2 py-1 rounded-full text-[11px] font-medium
-            bg-white/90 dark:bg-black/60 text-neutral-700 dark:text-white
+            bg-[var(--canvas-panel-strong)] text-[var(--canvas-panel-text)]
             pointer-events-none
           "
         >
@@ -122,13 +122,13 @@ export const ImageRef = ({ shape }: { shape: ImageRefShape }) => {
               className="
                 pointer-events-auto flex flex-col items-center justify-center gap-2
                 rounded-md border border-neutral-300 dark:border-white/20
-                bg-white/80 dark:bg-white/10 px-4 py-6 text-center
+                bg-[var(--canvas-panel-strong)] px-4 py-6 text-center
                 text-neutral-700 dark:text-neutral-100
               "
               onPointerDown={(e) => e.stopPropagation()}
               onClick={handleOpenPicker}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-200 dark:bg-white/10">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--canvas-panel-hover)]">
                 <ImageIcon className="h-5 w-5" />
               </div>
               <div className="text-sm font-medium">Upload reference image</div>
@@ -140,7 +140,7 @@ export const ImageRef = ({ shape }: { shape: ImageRefShape }) => {
         )}
 
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-black/60 text-sm text-neutral-700 dark:text-white">
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--canvas-panel)] text-sm text-[var(--canvas-panel-text)]">
             Loading image...
           </div>
         )}

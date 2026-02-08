@@ -138,8 +138,8 @@ export const GeneratedUI = ({
       <div
         className="
           w-full h-full relative rounded-xl
-          border border-neutral-300/80 dark:border-white/15
-          bg-white/80 dark:bg-black/40
+          border border-[var(--canvas-panel-border)]
+          bg-[var(--canvas-panel)]
           backdrop-blur-xl
           shadow-md dark:shadow-none
           overflow-hidden
@@ -213,13 +213,13 @@ export const GeneratedUI = ({
         </div>
 
         <div className="flex h-full flex-col pointer-events-auto">
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-neutral-200/70 dark:border-white/10 bg-white/70 dark:bg-black/20">
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)]">
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-red-400/90" />
               <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90" />
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
             </div>
-            <div className="text-xs text-neutral-500 dark:text-white/60">
+            <div className="text-xs text-[var(--canvas-panel-muted)]">
               {shape.isWorkflowPage ? "Workflow page" : "Generated page"}
             </div>
           </div>
@@ -228,7 +228,7 @@ export const GeneratedUI = ({
           {shape.uiSpecData ? (
             <div
               ref={viewportRef}
-              className="generated-ui-viewport relative flex-1 overflow-auto bg-white dark:bg-black/20"
+              className="generated-ui-viewport relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-[var(--canvas-panel-strong)]"
               style={{ pointerEvents: "auto" }}
             >
               <div
@@ -249,7 +249,7 @@ export const GeneratedUI = ({
               </div>
             </div>
           ) : (
-            <div className="text-center text-neutral-600 dark:text-white/60 p-4 animate-pulse">
+            <div className="text-center text-[var(--canvas-panel-muted)] p-4 animate-pulse">
               Generating…
             </div>
           )}
@@ -261,8 +261,8 @@ export const GeneratedUI = ({
         className="
           absolute -top-6 left-0 
           text-xs px-2 py-1 rounded
-          bg-neutral-200 dark:bg-black/40
-          text-neutral-800 dark:text-white
+          bg-[var(--canvas-panel)]
+          text-[var(--canvas-panel-text)]
           whitespace-nowrap
         "
       >

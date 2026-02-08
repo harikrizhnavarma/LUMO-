@@ -1,19 +1,27 @@
-import { SubscriptionEntitlementQuery } from "@/convex/query.config";
-import { redirect } from "next/navigation";
-import { combinedSlug } from "@/lib/utils";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useConvexAuth } from "convex/react";
 
-const Page = async () => {
-  const { profileName } = await SubscriptionEntitlementQuery();
+import { LumoShell } from "@/components/lumo-studios/lumo-shell";
+import { LumoLanding } from "@/components/lumo-studios/lumo-landing";
 
-  // If we somehow don't have a profile yet, go to sign-in
-  if (!profileName) {
-    redirect("/auth/sign-in");
-  }
+const Page = () => {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
-  // For development: ALWAYS go to dashboard, even without a subscription
-  redirect(`/dashboard/${combinedSlug(profileName!)}`);
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  return (
+    <LumoShell>
+      <LumoLanding />
+    </LumoShell>
+  );
 };
 
 export default Page;

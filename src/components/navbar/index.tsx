@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { SignOutButton } from "../buttons/sign-out";
 import { Autosave } from "../canvas/autosave";
+import { BrandInfluenceControl } from "../brand/brand-influence-control";
 import { useAppSelector } from "@/redux/store";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -19,6 +20,7 @@ type TabProps = {
   label: string;
   href: string;
   icon?: React.ReactNode;
+  placeholder?: boolean;
 };
 
 export const Navbar = () => {
@@ -34,6 +36,7 @@ export const Navbar = () => {
   const hasStyleGuide = pathname.includes("style-guide");
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(true);
+  const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(null);
 
   const showTabs = !!projectId && (hasCanvas || hasStyleGuide);
   const showProjectContext = showTabs;
@@ -44,6 +47,7 @@ export const Navbar = () => {
       ? { projectId: projectId as Id<"projects"> }
       : "skip"
   );
+  const studioProfile = useQuery(api.studioProfiles.getStudioProfile);
 
   if (!me) {
     return null;
@@ -61,6 +65,18 @@ export const Navbar = () => {
       setPreviewOpen(previewStored === "true");
     }
 
+    const storedProfile = window.localStorage.getItem("lumo_core_profile");
+    if (storedProfile) {
+      try {
+        const parsed = JSON.parse(storedProfile);
+        if (parsed?.avatarUrl) {
+          setLocalAvatarUrl(parsed.avatarUrl);
+        }
+      } catch {
+        setLocalAvatarUrl(null);
+      }
+    }
+
     const handleStorage = () => {
       const next = window.localStorage.getItem("toolbarVisible");
       if (next !== null) {
@@ -69,6 +85,15 @@ export const Navbar = () => {
       const nextPreview = window.localStorage.getItem("previewPanelOpen");
       if (nextPreview !== null) {
         setPreviewOpen(nextPreview === "true");
+      }
+      const nextProfile = window.localStorage.getItem("lumo_core_profile");
+      if (nextProfile) {
+        try {
+          const parsed = JSON.parse(nextProfile);
+          setLocalAvatarUrl(parsed?.avatarUrl ?? null);
+        } catch {
+          setLocalAvatarUrl(null);
+        }
       }
     };
 
@@ -97,9 +122,10 @@ export const Navbar = () => {
       icon: <Hash className="h-4 w-4" />,
     },
     {
-      label: "Style Guide",
-      href: `/dashboard/${me.name}/style-guide?project=${projectId}`,
+      label: "Vibecode",
+      href: "#",
       icon: <LayoutTemplate className="h-4 w-4" />,
+      placeholder: true,
     },
   ];
 
@@ -122,29 +148,40 @@ export const Navbar = () => {
     "user";
 
   const avatarSrc =
-    rawImage && rawImage.trim().length > 0
-      ? rawImage
-      : `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(
-          fallbackSeed
-        )}`;
+    (studioProfile?.avatarUrl &&
+    typeof studioProfile.avatarUrl === "string" &&
+    studioProfile.avatarUrl.trim().length > 0
+      ? studioProfile.avatarUrl
+      : localAvatarUrl && localAvatarUrl.trim().length > 0
+        ? localAvatarUrl
+        : rawImage && rawImage.trim().length > 0
+          ? rawImage
+          : `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(
+              fallbackSeed
+            )}`) ?? undefined;
 
   const wrapperClass =
     "grid p-6 fixed top-0 left-0 right-0 z-50 " +
+    "bg-transparent border-b border-transparent shadow-none pointer-events-none " +
     (showTabs ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2 lg:grid-cols-2");
 
   return (
     <div className={wrapperClass}>
       {/* Left: logo + project name */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pointer-events-auto">
         <Link
           href={`/dashboard/${me.name}`}
-          className="w-8 h-8 rounded-full border-3 border-white bg-black flex items-center justify-center"
+          className="logo"
+          aria-label="Lumo dashboard"
         >
-          <div className="w-4 h-4 rounded-full bg-white" />
+          <div className="logo-box" />
+          LUMO
         </Link>
 
         {showProjectContext && project && (
-          <div className="lg:inline-block hidden rounded-full backdrop-blur-xl bg-white/80 dark:bg-white/[0.08] px-4 py-2 text-sm text-neutral-900 dark:text-white saturate-150 border border-neutral-200 dark:border-white/15">
+          <div
+            className="inline-flex max-w-[40vw] truncate rounded-full backdrop-blur-xl bg-[var(--canvas-panel-strong)] px-4 py-2 text-sm text-[var(--canvas-panel-text)] saturate-150 border border-[var(--canvas-panel-border)]"
+          >
             Project / {project.name}
           </div>
         )}
@@ -152,32 +189,51 @@ export const Navbar = () => {
 
       {/* Center: tabs */}
       {showTabs && (
-        <div className="lg:flex hidden items-center justify-center gap-2">
-          <div className="flex items-center gap-2 backdrop-blur-xl bg-white/80 dark:bg-white/[0.08] border border-neutral-200 dark:border-white/[0.12] rounded-full p-2 saturate-150">
+        <div className="lg:flex hidden items-center justify-center gap-2 pointer-events-auto">
+          <div className="flex items-center gap-2 backdrop-blur-xl bg-[var(--canvas-panel-strong)] border border-[var(--canvas-panel-border)] rounded-md p-2 saturate-150">
             {tabs.map((t) => {
-              const active = isActiveTab(t.href);
-              return (
-                <Link
-                  key={t.href}
-                  href={t.href}
-                  className={[
-                    "group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition",
-                    active
-                      ? "bg-neutral-900 text-white border border-neutral-900 dark:bg-white dark:text-black dark:border-white"
-                      : "text-neutral-500 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-zinc-200 hover:bg-neutral-100 dark:hover:bg-white/[0.06] border border-transparent",
-                  ].join(" ")}
-                >
+              const active = t.placeholder ? false : isActiveTab(t.href);
+              const content = (
+                <>
                   <span
                     className={[
-                      "inline-flex items-center justify-center rounded-full w-6 h-6",
+                      "inline-flex items-center justify-center rounded-md w-6 h-6",
                       active
-                        ? "bg-white text-black"
-                        : "bg-neutral-200 text-neutral-800 dark:bg-white/10 dark:text-white",
+                        ? "bg-white/90 dark:bg-black/80 text-[var(--canvas-panel-text)]"
+                        : "bg-[var(--canvas-panel-hover)] text-[var(--canvas-panel-text)]",
                     ].join(" ")}
                   >
                     {t.icon}
                   </span>
                   <span>{t.label}</span>
+                </>
+              );
+
+              if (t.placeholder) {
+                return (
+                  <button
+                    key={t.label}
+                    type="button"
+                    className="group inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm transition text-[var(--canvas-panel-muted)] hover:text-[var(--canvas-panel-text)] hover:bg-[var(--canvas-panel-hover)] border border-transparent"
+                    onClick={(event) => event.preventDefault()}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+
+              return (
+                <Link
+                  key={t.href}
+                  href={t.href}
+                  className={[
+                    "group inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm transition",
+                    active
+                      ? "bg-[var(--canvas-accent)] text-white dark:text-black border border-[var(--canvas-accent)]"
+                      : "text-[var(--canvas-panel-muted)] hover:text-[var(--canvas-panel-text)] hover:bg-[var(--canvas-panel-hover)] border border-transparent",
+                  ].join(" ")}
+                >
+                  {content}
                 </Link>
               );
             })}
@@ -186,15 +242,16 @@ export const Navbar = () => {
       )}
 
       {/* Right: actions */}
-      <div className="flex items-center gap-4 justify-end">
+      <div className="flex items-center gap-4 justify-end pointer-events-auto">
+        {hasCanvas && <BrandInfluenceControl />}
         {hasCanvas && (
           <Button
             variant="secondary"
-            className="rounded-full h-12 px-4 flex items-center justify-center 
-            border border-neutral-300 dark:border-white/20 
-            bg-neutral-100 dark:bg-transparent
-            text-neutral-700 dark:text-white
-            hover:bg-neutral-200 dark:hover:bg-white/10 transition"
+            className="rounded-md h-12 px-4 flex items-center justify-center 
+            border border-[var(--canvas-panel-border)] 
+            bg-[var(--canvas-panel)]
+            text-[var(--canvas-panel-text)]
+            hover:bg-[var(--canvas-panel-hover-strong)] transition"
             onClick={() => {
               const next = !previewOpen;
               setPreviewOpen(next);
@@ -214,11 +271,11 @@ export const Navbar = () => {
         {hasCanvas && (
           <Button
             variant="secondary"
-            className="rounded-full h-12 px-4 flex items-center justify-center 
-            border border-neutral-300 dark:border-white/20 
-            bg-neutral-100 dark:bg-transparent
-            text-neutral-700 dark:text-white
-            hover:bg-neutral-200 dark:hover:bg-white/10 transition"
+            className="rounded-md h-12 px-4 flex items-center justify-center 
+            border border-[var(--canvas-panel-border)] 
+            bg-[var(--canvas-panel)]
+            text-[var(--canvas-panel-text)]
+            hover:bg-[var(--canvas-panel-hover-strong)] transition"
             onClick={() => {
               const next = !toolbarVisible;
               setToolbarVisible(next);
@@ -239,26 +296,26 @@ export const Navbar = () => {
 
         <Button
           variant="secondary"
-          className="rounded-full h-12 w-12 flex items-center justify-center 
-          border border-neutral-300 dark:border-white/20 
-          bg-neutral-100 dark:bg-transparent
-          text-neutral-700 dark:text-white
-          hover:bg-neutral-200 dark:hover:bg-white/10 transition"
+          className="rounded-md h-12 w-12 flex items-center justify-center 
+          border border-[var(--canvas-panel-border)] 
+          bg-[var(--canvas-panel)]
+          text-[var(--canvas-panel-text)]
+          hover:bg-[var(--canvas-panel-hover-strong)] transition"
         >
-          <CircleQuestionMark className="size-5 text-neutral-700 dark:text-white" />
+          <CircleQuestionMark className="size-5 text-[var(--canvas-panel-text)]" />
         </Button>
 
         <ThemeToggle />
 
         {/* 🔥 Avatar: always visible with fallback */}
-        <Avatar className="size-12 ml-2 border border-neutral-300 dark:border-white/20 overflow-hidden">
+        <Avatar className="size-12 ml-2 border border-[var(--canvas-panel-border)] overflow-hidden">
           <AvatarImage
             src={avatarSrc || undefined}
             alt={me?.name ?? "Profile picture"}
             className="object-cover"
           />
-          <AvatarFallback className="bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
-            <User className="size-5 text-neutral-700 dark:text-white" />
+          <AvatarFallback className="bg-[var(--canvas-panel-hover)] flex items-center justify-center">
+            <User className="size-5 text-[var(--canvas-panel-text)]" />
           </AvatarFallback>
         </Avatar>
 

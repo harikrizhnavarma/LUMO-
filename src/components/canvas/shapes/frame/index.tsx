@@ -48,11 +48,10 @@ export const Frame = ({
         {/* Frame label pill */}
         <span
           className="
-            text-[11px] font-medium 
-            px-2.5 py-0.5 rounded-full 
-            bg-neutral-900 text-white 
-            dark:bg-white dark:text-black 
-            border border-neutral-200 dark:border-white/30 
+            text-[11px] font-medium whitespace-nowrap 
+            px-2.5 py-0.5 rounded-md 
+            bg-[var(--canvas-panel-strong)] text-[var(--canvas-panel-text)] 
+            border border-[var(--canvas-panel-border)] 
             shadow-sm
           "
         >
@@ -68,12 +67,12 @@ export const Frame = ({
             variant="secondary"
             onClick={toggleInspiration}
             className="
-              h-7 rounded-full px-2.5 text-[11px] 
+              h-7 rounded-md px-2.5 text-[11px] 
               flex items-center gap-1
-              bg-neutral-200/90 dark:bg-white/10 
-              text-neutral-800 dark:text-white 
-              border border-neutral-300 dark:border-white/25 
-              hover:bg-neutral-300 dark:hover:bg-white/20
+              bg-[var(--canvas-panel)] 
+              text-[var(--canvas-panel-text)] 
+              border border-[var(--canvas-panel-border)] 
+              hover:bg-[var(--canvas-panel-hover-strong)]
             "
           >
             <Palette className="w-3 h-3" />
@@ -87,14 +86,12 @@ export const Frame = ({
             onClick={handleGenerateDesign}
             disabled={isGenerating}
             className="
-              h-7 rounded-full px-2.5 text-[11px] 
+              h-7 rounded-md px-2.5 text-[11px] 
               flex items-center gap-1
-              bg-neutral-900 text-white 
-              hover:bg-neutral-800
+              bg-[var(--canvas-accent)] text-white dark:text-black
+              hover:opacity-90
               disabled:opacity-60 disabled:cursor-not-allowed
-              dark:bg-white dark:text-black 
-              dark:hover:bg-white/90 
-              dark:border dark:border-white/30
+              border border-[var(--canvas-accent)]
             "
           >
             <Brush

@@ -565,6 +565,7 @@ export const GeneratedPanel = ({
   }, [shapesState.entities, shapesState.ids]);
 
   const [panelOpen, setPanelOpen] = useState(false);
+  const [panelMounted, setPanelMounted] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
   const [codeValue, setCodeValue] = useState("");
@@ -945,6 +946,7 @@ export const GeneratedPanel = ({
   };
 
   const panelWidth = panelOpen ? "min(58rem, 46vw)" : "0px";
+  const visibleWidth = panelOpen || panelMounted ? "min(58rem, 46vw)" : "0px";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -957,6 +959,17 @@ export const GeneratedPanel = ({
       );
     }
   }, [panelOpen, panelWidth]);
+
+  useEffect(() => {
+    if (panelOpen) {
+      setPanelMounted(true);
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      setPanelMounted(false);
+    }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [panelOpen]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1058,30 +1071,30 @@ export const GeneratedPanel = ({
     <>
       <aside
         className={cn(
-          "relative h-full shrink-0 border-l border-neutral-200/70 dark:border-white/10 bg-neutral-50 dark:bg-neutral-950/40 transition-all duration-300",
+          "relative mt-28 h-[calc(100%-7rem)] shrink-0 border-l border-[var(--canvas-panel-border)] bg-[var(--canvas-bg)] transition-opacity duration-300 ease-in-out will-change-[opacity]",
           panelOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
-        style={{ width: panelWidth }}
+        style={{ width: visibleWidth }}
       >
         <div className="flex h-full flex-col">
-        <div className="flex items-center gap-2 border-b border-neutral-200/70 dark:border-white/10 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-[var(--canvas-panel-border)] px-4 py-3">
           <div className="flex items-center gap-2">
-            <Monitor className="h-4 w-4 text-neutral-500 dark:text-white/60" />
-            <span className="text-sm font-medium text-neutral-700 dark:text-white/80">
+            <Monitor className="h-4 w-4 text-[var(--canvas-panel-muted)]" />
+            <span className="text-sm font-medium text-[var(--canvas-panel-text)]">
               Generated UI
             </span>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <div className="flex items-center rounded-full border border-neutral-200 bg-white/80 p-1 text-xs text-neutral-500 shadow-sm dark:border-white/10 dark:bg-black/30 dark:text-white/60">
+            <div className="flex items-center rounded-md border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] p-1 text-xs text-[var(--canvas-panel-muted)] shadow-sm">
               <button
                 type="button"
                 onClick={() => setViewMode("preview")}
                 className={cn(
-                  "flex items-center gap-1 rounded-full px-3 py-1 transition",
+                  "flex items-center gap-1 rounded-md px-3 py-1 transition",
                   viewMode === "preview"
-                    ? "bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black"
-                    : "hover:text-neutral-800 dark:hover:text-white"
+                    ? "bg-[var(--canvas-accent)] text-white dark:text-black shadow-sm"
+                    : "hover:text-[var(--canvas-panel-text)]"
                 )}
               >
                 <Eye className="h-3 w-3" />
@@ -1091,10 +1104,10 @@ export const GeneratedPanel = ({
                 type="button"
                 onClick={() => setViewMode("code")}
                 className={cn(
-                  "flex items-center gap-1 rounded-full px-3 py-1 transition",
+                  "flex items-center gap-1 rounded-md px-3 py-1 transition",
                   viewMode === "code"
-                    ? "bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black"
-                    : "hover:text-neutral-800 dark:hover:text-white"
+                    ? "bg-[var(--canvas-accent)] text-white dark:text-black shadow-sm"
+                    : "hover:text-[var(--canvas-panel-text)]"
                 )}
               >
                 <Code2 className="h-3 w-3" />
@@ -1109,7 +1122,7 @@ export const GeneratedPanel = ({
                 "h-8 w-8 p-0",
                 isChatOpen && activeChatId === activeId
                   ? "text-primary"
-                  : "text-neutral-500 dark:text-white/60"
+                  : "text-[var(--canvas-panel-muted)]"
               )}
               onClick={() => activeId && toggleChat(activeId)}
               disabled={!activeId}
@@ -1121,7 +1134,7 @@ export const GeneratedPanel = ({
             <Button
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-neutral-500 dark:text-white/60"
+              className="h-8 w-8 p-0 text-[var(--canvas-panel-muted)]"
               onClick={() => setPanelOpen(false)}
               title="Hide preview"
             >
@@ -1130,15 +1143,15 @@ export const GeneratedPanel = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto border-b border-neutral-200/70 dark:border-white/10 px-4 py-2">
+        <div className="flex items-center gap-2 overflow-x-auto border-b border-[var(--canvas-panel-border)] px-4 py-2">
           {generatedShapes.map((shape, index) => (
             <div
               key={shape.id}
               className={cn(
-                "group flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition",
+                "group flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs transition",
                 shape.id === activeId
-                  ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-neutral-200 bg-white/80 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-black/20 dark:text-white/60 dark:hover:border-white/30"
+                  ? "border-[var(--canvas-accent)] bg-[var(--canvas-accent)] text-white dark:text-black"
+                  : "border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] text-[var(--canvas-panel-muted)] hover:border-[var(--canvas-panel-hover-strong)]"
               )}
             >
               <button
@@ -1147,7 +1160,7 @@ export const GeneratedPanel = ({
                   event.stopPropagation();
                   setPendingDeleteId(shape.id);
                 }}
-                className="mr-1 hidden h-4 w-4 items-center justify-center rounded-full text-[10px] text-current transition group-hover:flex group-hover:bg-neutral-200/70 dark:group-hover:bg-white/15"
+                className="mr-1 hidden h-4 w-4 items-center justify-center rounded-md text-[10px] text-current transition group-hover:flex group-hover:bg-[var(--canvas-panel-hover-strong)]"
                 title="Remove design"
               >
                 ×
@@ -1165,7 +1178,7 @@ export const GeneratedPanel = ({
 
         {activeShape ? (
           <div className="flex flex-1 min-h-0 flex-col">
-            <div className="flex items-center gap-3 border-b border-neutral-200/70 dark:border-white/10 px-4 py-2 text-xs text-neutral-500 dark:text-white/60">
+            <div className="flex items-center gap-3 border-b border-[var(--canvas-panel-border)] px-4 py-2 text-xs text-[var(--canvas-panel-muted)]">
               <div className="flex items-center gap-2">
                 <span>Viewport</span>
                 <input
@@ -1176,7 +1189,7 @@ export const GeneratedPanel = ({
                   onChange={(e) =>
                     setViewportWidth(Math.max(320, Number(e.target.value) || 0))
                   }
-                  className="w-20 rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-700 shadow-sm focus:outline-none dark:border-white/10 dark:bg-black/30 dark:text-white/70"
+                  className="w-20 rounded border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] px-2 py-1 text-xs text-[var(--canvas-panel-text)] shadow-sm focus:outline-none"
                 />
                 <span>x</span>
                 <input
@@ -1189,7 +1202,7 @@ export const GeneratedPanel = ({
                       Math.max(320, Number(e.target.value) || 0)
                     )
                   }
-                  className="w-20 rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-700 shadow-sm focus:outline-none dark:border-white/10 dark:bg-black/30 dark:text-white/70"
+                  className="w-20 rounded border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] px-2 py-1 text-xs text-[var(--canvas-panel-text)] shadow-sm focus:outline-none"
                 />
               </div>
 
@@ -1239,22 +1252,22 @@ export const GeneratedPanel = ({
               <div className="flex-1 min-h-0 overflow-hidden p-4">
                 <div
                   ref={previewRef}
-                  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-black/40"
+                  className="flex h-full flex-col rounded-2xl border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] shadow-lg backdrop-blur-2xl"
                 >
-                  <div className="flex items-center gap-2 border-b border-neutral-200/70 px-4 py-2 text-xs text-neutral-500 dark:border-white/10 dark:text-white/60">
+                  <div className="flex items-center gap-2 border-b border-[var(--canvas-panel-border)] px-4 py-2 text-xs text-[var(--canvas-panel-muted)]">
                     <div className="flex items-center gap-1.5">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-400/90" />
                       <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90" />
                       <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
                     </div>
-                    <div className="ml-2 flex-1 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] text-neutral-500 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+                    <div className="ml-2 flex-1 rounded-md border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-hover)] px-3 py-1 text-[11px] text-[var(--canvas-panel-muted)]">
                       https://preview.lumo.ai/{activeShape.id.slice(0, 6)}
                     </div>
                   </div>
 
                   <div
                     ref={previewViewportRef}
-                    className="generated-ui-viewport flex-1 overflow-auto bg-neutral-100/60 p-6 dark:bg-black/30"
+                    className="generated-ui-viewport flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-[var(--canvas-panel-hover)] p-6"
                     style={{ pointerEvents: "auto" }}
                   >
                     <div
@@ -1280,11 +1293,11 @@ export const GeneratedPanel = ({
               </div>
             ) : (
               <div className="flex flex-1 min-h-0 overflow-hidden">
-                <div className="w-60 flex-col border-r border-neutral-200/70 bg-neutral-50 px-3 py-4 text-xs text-neutral-500 dark:border-white/10 dark:bg-black/30 dark:text-white/50">
+                <div className="w-60 flex-col border-r border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] px-3 py-4 text-xs text-[var(--canvas-panel-muted)]">
                   <div className="mb-3 font-semibold uppercase tracking-[0.2em]">
                     Explorer
                   </div>
-                  <div className="mb-3 rounded-md border border-neutral-200/70 bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white/70">
+                  <div className="mb-3 rounded-md border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--canvas-panel-muted)] shadow-sm">
                     Lumo Project
                   </div>
                   <div className="space-y-2">
@@ -1298,8 +1311,8 @@ export const GeneratedPanel = ({
                             className={cn(
                               "flex w-full items-center gap-2 rounded-md px-2 py-1 text-left transition",
                               selectedFile === entry.name
-                                ? "bg-neutral-900 text-white dark:bg-white dark:text-black"
-                                : "hover:bg-neutral-200/60 dark:hover:bg-white/10"
+                                ? "bg-[var(--canvas-panel-text)] text-[var(--canvas-bg)]"
+                                : "hover:bg-[var(--canvas-panel-hover)]"
                             )}
                           >
                             <FileText className="h-3.5 w-3.5" />
@@ -1319,7 +1332,7 @@ export const GeneratedPanel = ({
                                 [entry.name]: !isExpanded,
                               }))
                             }
-                            className="flex w-full items-center gap-1 rounded-md px-2 py-1 text-left hover:bg-neutral-200/60 dark:hover:bg-white/10"
+                            className="flex w-full items-center gap-1 rounded-md px-2 py-1 text-left hover:bg-[var(--canvas-panel-hover)]"
                           >
                             {isExpanded ? (
                               <ChevronDown className="h-3 w-3" />
@@ -1341,8 +1354,8 @@ export const GeneratedPanel = ({
                                     className={cn(
                                       "flex w-full items-center gap-2 rounded-md px-2 py-1 text-left transition",
                                       selectedFile === fullName
-                                        ? "bg-neutral-900 text-white dark:bg-white dark:text-black"
-                                        : "hover:bg-neutral-200/60 dark:hover:bg-white/10"
+                                        ? "bg-[var(--canvas-panel-text)] text-[var(--canvas-bg)]"
+                                        : "hover:bg-[var(--canvas-panel-hover)]"
                                     )}
                                   >
                                     <FileText className="h-3.5 w-3.5" />
@@ -1358,13 +1371,13 @@ export const GeneratedPanel = ({
                   </div>
                 </div>
                 <div className="flex h-full flex-1 flex-col gap-2 p-4">
-                  <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-white/60">
+                  <div className="flex items-center justify-between text-xs text-[var(--canvas-panel-muted)]">
                     <span>
                       Editing {selectedFile}
                       {!isSelectedEditable ? " (read-only)" : ""}
                     </span>
                     {!isSelectedEditable && (
-                      <span className="rounded-full border border-neutral-200 px-2 py-0.5 text-[10px] uppercase tracking-wide dark:border-white/10">
+                      <span className="rounded-md border border-[var(--canvas-panel-border)] px-2 py-0.5 text-[10px] uppercase tracking-wide">
                         Preview
                       </span>
                     )}
@@ -1374,7 +1387,7 @@ export const GeneratedPanel = ({
                     onChange={(e) =>
                       isSelectedEditable && setCodeValue(e.target.value)
                     }
-                    className="flex-1 resize-none rounded-xl border border-neutral-200 bg-white p-4 font-mono text-xs text-neutral-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:border-white/10 dark:bg-black/40 dark:text-white/80 dark:focus:ring-white/20"
+                    className="flex-1 resize-none rounded-xl border border-[var(--canvas-panel-border)] bg-[var(--canvas-panel-strong)] p-4 font-mono text-xs text-[var(--canvas-panel-text)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--canvas-panel-hover-strong)]"
                     spellCheck={false}
                     readOnly={!isSelectedEditable}
                   />
@@ -1383,7 +1396,7 @@ export const GeneratedPanel = ({
             )}
           </div>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-neutral-500 dark:text-white/60">
+          <div className="flex flex-1 items-center justify-center text-sm text-[var(--canvas-panel-muted)]">
             Generate a design to open the preview window.
           </div>
         )}

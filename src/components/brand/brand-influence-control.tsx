@@ -48,40 +48,21 @@ export const BrandInfluenceControl: React.FC = () => {
   };
 
   return (
-    <div
-      className="fixed top-27 left-0 z-30 pointer-events-none px-8"
-      style={{ right: "min(58rem, 46vw)" }}
-    >
-      <div className="inline-flex items-center gap-4 pointer-events-auto">
-        <div className="px-4 py-2 rounded-xlbackdrop-blur-xl
-                        bg-neutral-100/80 dark:bg-black/40
-                        border border-neutral-300 dark:border-white/10
-                        shadow-sm"
-        >
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Brand influence
-          </div>
-          <p className="text-[11px] text-muted-foreground">
-            0% = free exploration · 100% = strict BrandKit
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Active palette:{" "}
-            <span className="font-medium">{paletteName || "None selected"}</span>
-          </p>
-        </div>
-        <div className="min-w-[180px] flex flex-col items-end">
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={influence}
-            onChange={handleChange}
-            className="w-40"
-          />
-          <span className="text-xs text-muted-foreground mt-1">
-            {influence}%
-          </span>
-        </div>
+    <div className="pointer-events-auto">
+      <div className="relative flex items-center">
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={influence}
+          onChange={handleChange}
+          aria-label="Brand influence"
+          style={{ ["--brand-influence" as any]: `${influence}%` }}
+          className="brand-influence-slider w-52"
+        />
+        <span className="absolute inset-0 flex items-center justify-center text-[10px] uppercase tracking-[0.3em] text-[var(--canvas-panel-text)] pointer-events-none">
+          Brand influence
+        </span>
       </div>
     </div>
   );

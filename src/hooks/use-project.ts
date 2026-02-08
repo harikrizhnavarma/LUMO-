@@ -46,7 +46,8 @@ export const useProjectCreation = () => {
    * Returns the newly created projectId on success, or null on failure.
    */
   const createProject = async (
-    name?: string
+    name?: string,
+    description?: string
   ): Promise<Id<"projects"> | null> => {
     if (!user?.id) {
       toast.error("Please sign in to create projects");
@@ -63,6 +64,7 @@ export const useProjectCreation = () => {
       const result = await fetchMutation(api.projects.createProject, {
         userId: user.id as Id<"users">,
         name: name || undefined,
+        description: description || undefined,
         // Start every new project with a clean, empty canvas.
         // We don't want to carry over shapes from the previously opened project.
         sketchesData: {
@@ -84,9 +86,11 @@ export const useProjectCreation = () => {
           name: result.name,
           projectNumber: result.projectNumber,
           thumbnail,
+          description: description || undefined,
           lastModified: Date.now(),
           createdAt: Date.now(),
           isPublic: false,
+          isArchived: false,
         })
       );
 

@@ -21,14 +21,12 @@ export const ColorTheme = ({ title, swatches, className }: Props) => {
       <div>
         <h3 className="text-lg font-medium text-foreground/50">{title}</h3>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px">
         {swatches.map((swatch) => (
-          <div key={swatch.name}>
+          <div key={swatch.name} className="space-y-2">
             <ColorSwatch name={swatch.name} value={swatch.hexColor} />
             {swatch.description && (
-              <p className="text-xs text-muted-foreground mt-2">
-                {swatch.description}
-              </p>
+              <p className="text-xs text-muted-foreground">{swatch.description}</p>
             )}
           </div>
         ))}

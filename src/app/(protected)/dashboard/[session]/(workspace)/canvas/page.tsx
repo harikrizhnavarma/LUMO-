@@ -2,7 +2,7 @@ import React from "react";
 import { ProjectProvider } from "@/components/projects/provider";
 import { ProjectQuery } from "@/convex/query.config";
 import { CanvasWorkspace } from "@/components/canvas/workspace";
-import { BrandInfluenceControl } from "@/components/brand/brand-influence-control";
+import { LumoShell } from "@/components/lumo-studios/lumo-shell";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +16,11 @@ const CanvasPage = async ({ searchParams }: CanvasPageProps) => {
 
   if (!projectId) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">No project selected</p>
-      </div>
+      <LumoShell>
+        <div className="w-full h-screen flex items-center justify-center">
+          <p className="text-muted-foreground">No project selected</p>
+        </div>
+      </LumoShell>
     );
   }
 
@@ -26,33 +28,34 @@ const CanvasPage = async ({ searchParams }: CanvasPageProps) => {
 
   if (!profile) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Authentication required</p>
-      </div>
+      <LumoShell>
+        <div className="w-full h-screen flex items-center justify-center">
+          <p className="text-muted-foreground">Authentication required</p>
+        </div>
+      </LumoShell>
     );
   }
 
   if (!project) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-red-500">Project not found or access denied</p>
-      </div>
+      <LumoShell>
+        <div className="w-full h-screen flex items-center justify-center">
+          <p className="text-red-500">Project not found or access denied</p>
+        </div>
+      </LumoShell>
     );
   }
 
   return (
-    <ProjectProvider initialProject={project}>
-      <div className="flex flex-col h-screen">
-        {/* Push the Brand Influence bar below the top navbar */}
-        <div className="mt-24">
-          <BrandInfluenceControl />
+    <LumoShell>
+      <ProjectProvider initialProject={project}>
+        <div className="flex flex-col h-screen">
+          <div className="flex-1 min-h-0">
+            <CanvasWorkspace />
+          </div>
         </div>
-
-        <div className="flex-1 min-h-0">
-          <CanvasWorkspace />
-        </div>
-      </div>
-    </ProjectProvider>
+      </ProjectProvider>
+    </LumoShell>
   );
 };
 

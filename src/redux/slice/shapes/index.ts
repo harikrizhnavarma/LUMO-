@@ -318,7 +318,7 @@ const makeText = (p: {
   textTransform: p.textTransform ?? "none",
   stroke: "transparent",
   strokeWidth: 0,
-  fill: p.fill ?? "#ffffff",
+  fill: p.fill ?? null,
 });
 
 const makeGeneratedUI = (p: {

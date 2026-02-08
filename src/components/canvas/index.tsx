@@ -65,11 +65,7 @@ export const InfiniteCanvas = ({
           relative w-full h-full overflow-hidden select-none z-0
 
           /* ⭐ THEME-AWARE CANVAS BACKGROUND */
-          bg-[radial-gradient(circle,_rgba(0,0,0,0.08)_1px,_transparent_1px)]
-          dark:bg-[radial-gradient(circle,_rgba(255,255,255,0.15)_1px,_transparent_1px)]
-
-          /* background color underneath dots */
-          bg-neutral-50 dark:bg-neutral-900
+          bg-transparent
           `,
           {
             "cursor-grabbing": viewport.mode === "panning",

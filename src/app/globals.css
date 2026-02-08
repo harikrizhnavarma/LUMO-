@@ -121,10 +121,32 @@
 
 :root {
   --canvas-stroke: #111111;  /* light mode black */
+  --canvas-bg: #f5f5f7;
+  --canvas-grid: rgba(0, 0, 0, 0.06);
+  --canvas-panel: rgba(255, 255, 255, 0.78);
+  --canvas-panel-strong: rgba(255, 255, 255, 0.95);
+  --canvas-panel-border: rgba(0, 0, 0, 0.08);
+  --canvas-panel-text: #1a1a1a;
+  --canvas-panel-muted: rgba(0, 0, 0, 0.55);
+  --canvas-panel-hover: rgba(0, 0, 0, 0.04);
+  --canvas-panel-hover-strong: rgba(0, 0, 0, 0.08);
+  --canvas-accent: #ff3e00;
+  --canvas-accent-weak: rgba(255, 62, 0, 0.12);
 }
 
 .dark {
   --canvas-stroke: #ffffff;  /* dark mode white */
+  --canvas-bg: #171717;
+  --canvas-grid: rgba(255, 255, 255, 0.15);
+  --canvas-panel: rgba(0, 0, 0, 0.4);
+  --canvas-panel-strong: rgba(0, 0, 0, 0.6);
+  --canvas-panel-border: rgba(255, 255, 255, 0.1);
+  --canvas-panel-text: #ffffff;
+  --canvas-panel-muted: rgba(255, 255, 255, 0.6);
+  --canvas-panel-hover: rgba(255, 255, 255, 0.08);
+  --canvas-panel-hover-strong: rgba(255, 255, 255, 0.15);
+  --canvas-accent: #ff3e00;
+  --canvas-accent-weak: rgba(255, 62, 0, 0.18);
 }
 
 @layer base {
@@ -148,6 +170,51 @@
 .generated-ui-viewport [data-generated-ui] canvas {
   max-width: 100%;
   height: auto;
+}
+
+.brand-influence-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--canvas-panel-border);
+  background: linear-gradient(
+    90deg,
+    var(--canvas-accent) 0%,
+    var(--canvas-accent) var(--brand-influence, 75%),
+    var(--canvas-panel-hover-strong) var(--brand-influence, 75%),
+    var(--canvas-panel-hover-strong) 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.brand-influence-slider:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--canvas-accent-weak);
+}
+
+.brand-influence-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--canvas-panel-strong);
+  border: 2px solid var(--canvas-accent);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.brand-influence-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--canvas-panel-strong);
+  border: 2px solid var(--canvas-accent);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.brand-influence-slider::-moz-range-track {
+  background: transparent;
 }
 
 

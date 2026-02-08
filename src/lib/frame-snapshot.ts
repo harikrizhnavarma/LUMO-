@@ -416,8 +416,6 @@ export const exportGeneratedUIAsPNG = async (
     });
 
     const canvas = document.createElement("canvas");
-    canvas.width = rect.width;
-    canvas.height = rect.height;
     const ctx = canvas.getContext("2d");
 
     if (!ctx) {
@@ -432,8 +430,27 @@ export const exportGeneratedUIAsPNG = async (
     ) as HTMLElement | null;
 
     if (contentDiv) {
-      console.log("Found content div, capturing visual content");
-      await captureVisualContent(ctx, contentDiv, rect.width, rect.height);
+      const targetWidth = Math.max(
+        contentDiv.scrollWidth,
+        contentDiv.clientWidth,
+        rect.width
+      );
+      const targetHeight = Math.max(
+        contentDiv.scrollHeight,
+        contentDiv.clientHeight,
+        rect.height
+      );
+
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      console.log("Found content div, capturing full content", {
+        targetWidth,
+        targetHeight,
+      });
+      await captureVisualContent(ctx, contentDiv, targetWidth, targetHeight);
     } else {
       throw new Error("No content div found for export");
     }

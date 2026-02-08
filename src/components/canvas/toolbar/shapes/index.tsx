@@ -84,20 +84,23 @@ const tools: Array<{
   },
 ];
 
-export const ToolBarShapes = () => {
+export const ToolBarShapes = ({ className }: { className?: string }) => {
   const { currentTool, selectTool } = useInfiniteCanvas();
 
   return (
     <div className="col-span-1 flex justify-center items-center">
       <div
-        className="
-        flex items-center gap-2
-        backdrop-blur-xl 
-        bg-neutral-200/70 dark:bg-white/10
-        border border-neutral-300 dark:border-white/20
-        rounded-full p-3
-        transition
-      "
+        className={cn(
+          `
+          flex items-center gap-1.5
+          backdrop-blur-xl 
+          bg-[var(--canvas-panel)]
+          border border-[var(--canvas-panel-border)]
+          rounded-md p-3
+          transition
+          `,
+          className
+        )}
       >
         {tools.map((tool) => (
           <Button
@@ -106,10 +109,10 @@ export const ToolBarShapes = () => {
             size="lg"
             onClick={() => selectTool(tool.id)}
             className={cn(
-              "cursor-pointer rounded-full p-3 transition border",
+              "cursor-pointer rounded-md p-2 transition border",
               currentTool === tool.id
-                ? "text-neutral-900 dark:text-white bg-neutral-300 dark:bg-white/20 border-neutral-400 dark:border-white/30"
-                : "text-neutral-700 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-300/50 dark:hover:bg-white/10 border-transparent"
+                ? "text-white dark:text-black bg-[var(--canvas-accent)] border-[var(--canvas-accent)]"
+                : "text-[var(--canvas-panel-muted)] hover:text-[var(--canvas-panel-text)] hover:bg-[var(--canvas-panel-hover)] border-transparent"
             )}
             title={`${tool.label} - ${tool.description}`}
           >
